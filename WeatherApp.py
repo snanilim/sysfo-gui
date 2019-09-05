@@ -52,7 +52,7 @@ root = tk.Tk()
 canvas = tk.Canvas(root, height=HEIGHT, width=WIDTH)
 canvas.pack()
 
-background_image = tk.PhotoImage(file="login-background-2.png")
+background_image = tk.PhotoImage(file="img/login-background-2.png")
 background_label = tk.Label(root, image=background_image)
 background_label.place(relwidth=1, relheight=1)
 
