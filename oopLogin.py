@@ -7,6 +7,15 @@ import pprint
 import paho.mqtt.client as mqtt
 import re, uuid
 import time
+from tkinter import scrolledtext
+
+from get_data import *
+
+class GetData(object):
+    def registrationInfo(self):
+        res_info = getRegData()
+        # res_info = json.dumps(res_info)
+        return res_info
 
 
 
@@ -94,6 +103,7 @@ class Container(tk.Tk):
             frame.place(relwidth=1, relheight=1)
 
         self.show_frame(LoginPage)
+        # self.show_frame(InfoPage)
 
     def show_frame(self, cont):
         print('cont', cont)
@@ -134,8 +144,6 @@ class LoginPage(tk.Frame):
         def get_info(userid, password, controller):
             print(f'user ID {userid}, password {password}')
 
-
-            
             # mqtt start
             client = MQTTClient()
             info = {"userid" : userid, "password": password}
@@ -164,7 +172,6 @@ class LabIDPage(tk.Frame):
         labIDEntry = tk.Entry(self, font=('Courier', 15))
         labIDEntry.place(relx=0.30, rely=0.25, relwidth=0.6, relheight=0.12)
 
-
         button = tk.Button(self, text="Submit", font=('Courier', 12), bg="#749492", command=lambda: get_info(labIDEntry.get(), controller))
         button.place(relx=0.35, rely=0.70, relheight=0.15, relwidth=0.4)
 
@@ -192,16 +199,79 @@ class InfoPage(tk.Frame):
     def __init__(self, parent, controller, FrameBack):
         tk.Frame.__init__(self, parent, bg=FrameBack)
 
-        label = tk.Label(self, bg=FrameBack, font=('Courier', 22), text="Info Page", justify='left')
-        label.place(relwidth=1, relheight=0.2)
+        def on_configure(event):
+            canvas.configure(scrollregion=canvas.bbox('all'))
 
-        labIDLabel = tk.Label(self, bg=FrameBack, font=('Courier', 15), text="CPU:", justify='left')
-        labIDLabel.place(relx=0.03, rely=0.25, relwidth=0.3, relheight=0.12, anchor='nw')
+        canvas = tk.Canvas(self)
+        canvas.place(relx=0, rely=0.2, relheight=0.8, relwidth=1)
+
+        frame = tk.Frame(canvas)
+        # resize the canvas scrollregion each time the size of the frame changes
+        frame.bind('<Configure>', on_configure)
+        # display frame inside the canvas
+        canvas.create_window(1, 0, window=frame)
+
+        scrolly = tk.Scrollbar(self, command=canvas.yview)
+        scrolly.place(relx=1, rely=0, relheight=1, anchor='ne')
+        canvas.configure(yscrollcommand=scrolly.set)
 
 
+        get_data = GetData()
+        data = get_data.registrationInfo()
 
-        button = tk.Button(self, text="Submit", font=('Courier', 12), bg="#749492", command=lambda: get_info("info", controller))
-        button.place(relx=0.35, rely=0.70, relheight=0.15, relwidth=0.4)
+        res_info = json.dumps(data)
+
+        cpu_info = data['cpu_info']
+        memory_info = data['memory_info']
+        disk_info = data['disk_info']
+
+        def bytesTo(bytes, to, bazeSize=1024):
+            rangeNum = {'k' : 1, 'm': 2, 'g' : 3, 't' : 4, 'p' : 5, 'e' : 6 }
+            total = bytes
+            for i in range(rangeNum[to]):
+                total = total / bazeSize
+            return round(total,3)
+
+        # print(bytesTo(8277684224, 'g'))
+
+        # print('data', data)
+
+        label = tk.Label(self, font=('Courier', 18), text="Device Registration Info", justify='left')
+        label.place(relx=0, rely=0, relheight=0.2, relwidth=1)
+
+        cpu = tk.Label(frame, font=('Courier', 14), text=f"CPU Information:", justify='left', anchor='w')
+        cpu.pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+
+        tk.Label(frame, font=('Courier', 10), text=f"Brand: {cpu_info['brand']}", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+        tk.Label(frame, font=('Courier', 10), text=f"Manufacturer: {cpu_info['vendor_id']}", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+        tk.Label(frame, font=('Courier', 10), text=f"Version: {cpu_info['cpuinfo_version']}", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+        tk.Label(frame, font=('Courier', 10), text=f"Bits: {cpu_info['bits']} bits", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+
+        space = tk.Label(frame, font=('Courier', 14), text="", justify='left', anchor='w')
+        space.pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+
+        ram = tk.Label(frame, font=('Courier', 14), text="Ram Information:", justify='left', anchor='w')
+        ram.pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+
+        tk.Label(frame, font=('Courier', 10), text=f"Total: {bytesTo(memory_info['total'], 'g')} gb", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+        tk.Label(frame, font=('Courier', 10), text=f"Used: {bytesTo(memory_info['used'], 'g')} gb", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+        tk.Label(frame, font=('Courier', 10), text=f"Free: {bytesTo(memory_info['free'], 'g')} gb", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+
+        space = tk.Label(frame, font=('Courier', 14), text="", justify='left', anchor='w')
+        space.pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+
+        disk = tk.Label(frame, font=('Courier', 14), text="Disk Information:", justify='left', anchor='w')
+        disk.pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+
+        tk.Label(frame, font=('Courier', 10), text=f"Total: {bytesTo(disk_info['total'], 'g')} gb", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+        tk.Label(frame, font=('Courier', 10), text=f"Used: {bytesTo(disk_info['used'], 'g')} gb", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+        tk.Label(frame, font=('Courier', 10), text=f"Free: {bytesTo(disk_info['free'], 'g')} gb", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+
+        space = tk.Label(frame, font=('Courier', 14), text="", justify='left', anchor='w')
+        space.pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+
+        button = tk.Button(frame, text="Submit", font=('Courier', 12), bg="#749492", command=lambda: get_info(res_info, controller))
+        button.pack(side = tk.RIGHT, fill=tk.BOTH, expand=tk.FALSE)
 
         def get_info(info, controller):
             print(f'lab ID {info}')
@@ -209,7 +279,7 @@ class InfoPage(tk.Frame):
             # mqtt start
             client = MQTTClient()
             info = {"info" : info}
-            client.on_publish('srdl/labid/', info)
+            client.on_publish('srdl/reginfo/', info)
             client.on_loop_forever()
             result = client.result
             # mqtt end

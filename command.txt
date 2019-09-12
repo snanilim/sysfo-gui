@@ -1,0 +1,20 @@
+https://www.linuxnix.com/find-ram-details-in-linuxunix/
+sudo dmidecode -t 17
+sudo dmidecode -t 2
+
+cat /sys/devices/virtual/dmi/id/board_{vendor,name,version}
+sudo cat /sys/devices/virtual/dmi/id/board_{vendor,name,version,serial}
+
+
+publish:
+srdl/res_login/
+
+subscribe:
+srdl/login/
+srdl/labid/
+srdl/reginfo/
+
+response:
+{
+   "result": "True"
+}
