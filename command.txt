@@ -6,13 +6,16 @@ cat /sys/devices/virtual/dmi/id/board_{vendor,name,version}
 sudo cat /sys/devices/virtual/dmi/id/board_{vendor,name,version,serial}
 
 
-publish:
-srdl/res_login/
+MQTT:---------------------------------------
+broker.hivemq.com
 
 subscribe:
 srdl/login/
 srdl/labid/
 srdl/reginfo/
+
+publish:
+srdl/res_login/
 
 response:
 {

@@ -102,8 +102,8 @@ class Container(tk.Tk):
 
             frame.place(relwidth=1, relheight=1)
 
-        self.show_frame(LoginPage)
-        # self.show_frame(InfoPage)
+        # self.show_frame(LoginPage)
+        self.show_frame(InfoPage)
 
     def show_frame(self, cont):
         print('cont', cont)
@@ -253,9 +253,10 @@ class InfoPage(tk.Frame):
         ram = tk.Label(frame, font=('Courier', 14), text="Ram Information:", justify='left', anchor='w')
         ram.pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
 
-        tk.Label(frame, font=('Courier', 10), text=f"Total: {bytesTo(memory_info['total'], 'g')} gb", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
-        tk.Label(frame, font=('Courier', 10), text=f"Used: {bytesTo(memory_info['used'], 'g')} gb", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
-        tk.Label(frame, font=('Courier', 10), text=f"Free: {bytesTo(memory_info['free'], 'g')} gb", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+        tk.Label(frame, font=('Courier', 10), text=f"Total: {bytesTo(memory_info['total'], 'g')} Gib", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+        tk.Label(frame, font=('Courier', 10), text=f"Used: {bytesTo(memory_info['used'], 'g')} Gib", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+        tk.Label(frame, font=('Courier', 10), text=f"Free: {bytesTo(memory_info['total'] - memory_info['used'], 'g')} Gib", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+        tk.Label(frame, font=('Courier', 10), text=f"percent: {memory_info['percent']}%", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
 
         space = tk.Label(frame, font=('Courier', 14), text="", justify='left', anchor='w')
         space.pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
@@ -263,9 +264,9 @@ class InfoPage(tk.Frame):
         disk = tk.Label(frame, font=('Courier', 14), text="Disk Information:", justify='left', anchor='w')
         disk.pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
 
-        tk.Label(frame, font=('Courier', 10), text=f"Total: {bytesTo(disk_info['total'], 'g')} gb", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
-        tk.Label(frame, font=('Courier', 10), text=f"Used: {bytesTo(disk_info['used'], 'g')} gb", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
-        tk.Label(frame, font=('Courier', 10), text=f"Free: {bytesTo(disk_info['free'], 'g')} gb", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+        tk.Label(frame, font=('Courier', 10), text=f"Total: {bytesTo(disk_info['total'], 'g')} Gib", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+        tk.Label(frame, font=('Courier', 10), text=f"Used: {bytesTo(disk_info['used'], 'g')} Gib", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+        tk.Label(frame, font=('Courier', 10), text=f"Free: {bytesTo(disk_info['free'], 'g')} Gib", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
 
         space = tk.Label(frame, font=('Courier', 14), text="", justify='left', anchor='w')
         space.pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
