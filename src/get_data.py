@@ -108,26 +108,67 @@ def gateway_ip():
     ip = get('https://api.ipify.org').text
     return ip
 
-def getRegData():
-    reg_info = {}
-    status_info = _getStatus()
-    reg_info.update({'status': status_info})
+def getData(data):
+    # print('msg', msg.split(','))
+    all_info = {}
 
-    # cpu info
-    cpu_info = _getCpuInfo()
-    reg_info.update({'cpu_info': cpu_info})
-
-
-    # memory info
-    memory_info = _getMemoryInfo()
-    reg_info.update({'memory_info': memory_info})
+    status_value = data.get("status", "")
+    if 'status' in data and status_value == 1:
+        # status info
+        status_info = _getStatus()
+        all_info.update({'status': status_info})
 
 
-    # disk info
-    disk_info = _getDiskInfo()
-    reg_info.update({'disk_info': disk_info})
+    idle_value = data.get("idle", "")
+    if 'idle' in data and idle_value == 1:
+        # idle info
+        idle_info = _getIdleTime()
+        all_info.update({'idle': idle_info})
 
 
-    return reg_info
+    cpu_value = data.get("cpu", "")
+    if 'cpu' in data and cpu_value == 1:
+        # cpu info
+        cpu_info = _getCpuInfo()
+        all_info.update({'cpu_info': cpu_info})
+
+
+    memory_value = data.get("memory", "")
+    if 'memory' in data and memory_value == 1:
+        print('memory')
+        # memory info
+        memory_info = _getMemoryInfo()
+        all_info.update({'memory_info': memory_info})
+
+
+    disk_value = data.get("disk", "")
+    if 'disk' in data and disk_value == 1:
+        # disk info
+        disk_info = _getDiskInfo()
+        all_info.update({'disk_info': disk_info})
+
+
+    process_value = data.get("process", "")
+    if 'process' in data and process_value == 1:
+        # process info
+        process_info = _getProcessInfo()
+        all_info.update({'process_info': process_info})
+
+
+    network_value = data.get("network", "")
+    if 'network' in data and network_value == 1:
+        # network info
+        network_info = _getNetworkInfo()
+        all_info.update({'network_info': network_info})
+    
+    mac_addr_value = mac_addr()
+    all_info.update({'mac_addr': mac_addr_value})
+
+    gateway_ip_value = gateway_ip()
+    all_info.update({'gateway_ip': gateway_ip_value})
+
+    return all_info
+    # pp = pprint.PrettyPrinter(indent=4)
+    # pp.pprint(all_info)
 
 

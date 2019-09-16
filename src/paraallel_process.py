@@ -4,18 +4,21 @@ from time import sleep
 # all your methods declarations above go here
 # (...)
 
-def Process1(largefile):
+ovalue = 0
+
+def loginProcess(largefile):
     import oopLogin
     return True
 
-def Process2(bigfile):
-    import data_entry
+def countProcess(bigfile):
+    from count_entry import CountEntry
+    count = CountEntry()
+    count.mainListener()
     return True
 
-def Process3(integer):
-    print('Start of process 3')                                                                            
-    sleep(10)                                                                       
-    print('End of process 3')
+def runSchedule(integer):
+    from run_scheduler import run_schedule
+    run_schedule()
     return True
 
 def FinalProcess(parsed,pattern,calc_results):
@@ -26,8 +29,9 @@ def FinalProcess(parsed,pattern,calc_results):
 
 def main():
     pool = Pool(processes=3)
-    # runMqtt = pool.apply_async(Process1, ['largefile'])
-    runDataEntry = pool.apply_async(Process2, ['largefile'])
+    runMqtt = pool.apply_async(loginProcess, ['largefile'])
+    runCountEntry = pool.apply_async(countProcess, [ovalue])
+    runSchedul = pool.apply_async(runSchedule, [ovalue])
 
     pool.close()
     pool.join()

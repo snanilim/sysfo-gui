@@ -13,8 +13,17 @@ from get_data import *
 
 class GetData(object):
     def registrationInfo(self):
-        res_info = getRegData()
-        # res_info = json.dumps(res_info)
+        data = {
+            "info": 1,
+            "status": 1,
+            "idle": 0,
+            "cpu": 1,
+            "memory": 1,
+            "disk": 1,
+            "process": 0,
+            "network": 0
+        }
+        res_info = getData(data)
         return res_info
 
 
