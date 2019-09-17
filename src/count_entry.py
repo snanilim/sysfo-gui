@@ -1,20 +1,42 @@
 from pynput import mouse, keyboard
 from datetime import datetime, timedelta
+import json
+import ast
 
 
 class CountEntry(object):
     def __init__(self, *args, **kwargs):
+        self.mintIncrement = 1
         self.mouse_click_count = 0
         self.key_press_count = 0
 
+        self.today = datetime.today()
+        self.addedTime = self.today + timedelta(minutes=self.mintIncrement)
+
+
     def _update_count(self):
-        f = open(f"./idlefile.txt", "w")
-        message = {
-            "click": self.mouse_click_count,
-            "press": self.key_press_count
-        }
-        f.write(str(message))
-        f.close()
+        self.today = datetime.today()
+        presentTime = datetime.strptime(format(self.today), '%Y-%m-%d %H:%M:%S.%f')
+
+        if presentTime > self.addedTime:
+
+            fileRead = open("./idlefile.txt", "r")
+            data = fileRead.read()
+            data = ast.literal_eval(data)
+            clickCount = data['click']
+            pressCount = data['press']
+            
+            fileWrite = open("./idlefile.txt", "w")
+            message = {
+                "click": clickCount + self.mouse_click_count,
+                "press": pressCount + self.key_press_count
+            }
+            fileWrite.write(str(message))
+            fileWrite.close()
+
+            self.mouse_click_count = 0
+            self.key_press_count = 0
+            self.addedTime = self.today + timedelta(minutes=self.mintIncrement)
         return True
 
     def _on_press(self, key):
