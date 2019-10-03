@@ -4,10 +4,12 @@ import requests
 import json
 import pprint
 
-import paho.mqtt.client as mqtt
 import re, uuid
 import time
 from tkinter import scrolledtext
+import datetime
+import os
+from client_mqtt import MQTTClient
 
 from get_data import *
 
@@ -26,76 +28,26 @@ class GetData(object):
         res_info = getData(data)
         return res_info
 
-
-
-class MQTTClient(object):
-    def __init__(self, *args, **kwargs):
-        try:
-            uuid.uuid4
-            r = str(uuid.uuid4())
-            
-            self.result = bool
-            self.msg = dict
-
-            self.BROKER_IP = "broker.hivemq.com"
-            self.PORT = 1883
-
-            self.client = mqtt.Client(r)
-            self.client.on_connect = self.on_connect
-            self.client.on_message = self.on_message
-            self.client.connect(self.BROKER_IP, self.PORT, 60)
-
-            print(f"Connected to {0}, starting MQTT loop")
-            # self.client.loop_forever()
-            # self.client.loop_start()
-        except Exception as e:
-            print("error", e)
-
-    def on_message(self,client,userdata,message):
-        print("topic: "+message.topic+"	"+"payload: "+str(message.payload.decode("utf-8")))
-        msg = str(message.payload.decode("utf-8"))
-        data = json.loads(msg)
-        value = data.get("result", "")
-        self.result = eval(value)
-        self.on_loop_stop()
-
-    def on_connect(self, client, userdata, flags, rc):
-        print("Connected with result code " + str(rc))
-        self.client.subscribe("srdl/res_login/", 1)
-
-    def on_publish(self, topicUri, message):
-        topic = message
-        topic_dump = json.dumps(topic)
-        self.client.publish(topicUri, topic_dump)
-        print('Publish')
-
-    def on_loop_forever(self):
-        print('work')
-        self.client.loop_forever()
-
-    def on_loop_stop(self):
-        print('work')
-        self.client.loop_stop()
-        self.client.disconnect()
-
         
 
 # client = MQTTClient()
-        
 
 
 class Container(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
+        # tk.title("Python GUI")
+        # win = tk.Tk()               # Create instance 
+        self.winfo_toplevel().title("Sheikh Rasel Digital Lab")
 
         WIDTH = 600
         HEIGHT = 400
-        FrameBack = '#c1c1c1'
+        FrameBack = '#a19eae'
 
         canvas = tk.Canvas(self, height=HEIGHT, width=WIDTH)
         canvas.pack()
 
-        self.background_image = tk.PhotoImage(file="./img/back-04.png")
+        self.background_image = tk.PhotoImage(file="./img/login-background-8.png")
         background_label = tk.Label(master=self, image=self.background_image)
         background_label.place(relwidth=1, relheight=1)
 
@@ -111,8 +63,8 @@ class Container(tk.Tk):
 
             frame.place(relwidth=1, relheight=1)
 
-        # self.show_frame(LoginPage)
-        self.show_frame(InfoPage)
+        self.show_frame(LoginPage)
+        # self.show_frame(InfoPage)
 
     def show_frame(self, cont):
         print('cont', cont)
@@ -129,8 +81,6 @@ class LoginPage(tk.Frame):
     def __init__(self, parent, controller, FrameBack):
         tk.Frame.__init__(self, parent, bg=FrameBack)
 
-        
-        
         label = tk.Label(self, bg=FrameBack, font=('Courier', 22), text="Login", justify='left')
         label.place(relwidth=1, relheight=0.2)
 
@@ -147,7 +97,7 @@ class LoginPage(tk.Frame):
         passwordEntry = tk.Entry(self, font=('Courier', 15), show="*",)
         passwordEntry.place(relx=0.30, rely=0.45, relwidth=0.6, relheight=0.12)
 
-        button = tk.Button(self, text="Submit", font=('Courier', 12), bg="#749492", command=lambda: get_info(userIDEntry.get(), passwordEntry.get(), controller))
+        button = tk.Button(self, text="Submit", font=('Courier', 12), bg="#555c9c", command=lambda: get_info(userIDEntry.get(), passwordEntry.get(), controller))
         button.place(relx=0.35, rely=0.70, relheight=0.15, relwidth=0.4)
 
         def get_info(userid, password, controller):
@@ -296,6 +246,22 @@ class InfoPage(tk.Frame):
 
             if result:
                 print('result', result)
+                device_uuid = '09101u32cnwc0'
+                auth_token = f'this is auth token of device id {device_uuid}'
+                today = datetime.datetime.now()
+                token_obj = {
+                    "device_uuid": device_uuid,
+                    "auth_token": auth_token,
+                    "date": today
+                }
+                dirPath = os.path.dirname(os.path.abspath(__file__))
+                fileWrite = open(f"{dirPath}/config/conf-01.txt", "w")
+                def enc(str):
+	                return ' '.join(bin(ord(char)).split('b')[1].rjust(8, '0') for char in str)
+                token_obj = enc(str(token_obj))
+                fileWrite.write(token_obj)
+                fileWrite.close()
+
                 # controller.show_frame(LabIDPage)
                 app.quit()
                 print('quit')
