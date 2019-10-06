@@ -1,6 +1,7 @@
 import paho.mqtt.client as mqtt
 import uuid, json, os
 import datetime
+from hepler import *
 
 
 class MQTTClient(object):
@@ -11,6 +12,7 @@ class MQTTClient(object):
             
             self.result = bool
             self.msg = dict
+            self.device_uid = str
 
             self.BROKER_IP = "broker.hivemq.com"
             self.PORT = 1883
@@ -30,21 +32,29 @@ class MQTTClient(object):
         print("topic: "+message.topic+"	"+"payload: "+str(message.payload.decode("utf-8")))
         msg = str(message.payload.decode("utf-8"))
 
-        dirPath = os.path.dirname(os.path.abspath(__file__))
-        fileRead = open(f"{dirPath}/config/conf-01.txt", "r")
-        data = fileRead.read()
+        msg_data = json.loads(msg)
+        auth_value = msg_data.get("auth", "")
+
+        data = has_data_on_file()
 
         if data:
             print('msg', msg)
-        else:
-            data = json.loads(msg)
-            value = data.get("result", "")
-            self.result = eval(value)
+        elif 'auth' in msg_data and auth_value == 1:
+            self.msg = msg_data
+            # value = msg_data.get("result", "")
+            # device_uid = msg_data.get("device_uid", "")
+            # time_frame = msg_data.get("time_frame", "")
+            # self.result = eval(value)
+            # self.device_uid = device_uid
+            # self.time_frame = time_frame
             self.on_loop_stop()
 
     def on_connect(self, client, userdata, flags, rc):
         print("Connected with result code " + str(rc))
         self.client.subscribe("srdl/res_login/", 1)
+
+    def on_subscribe(self, topicUri):
+        self.client.subscribe(topicUri, 1)
 
     def on_publish(self, topicUri, message):
         topic = message

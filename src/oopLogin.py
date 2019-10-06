@@ -10,8 +10,8 @@ from tkinter import scrolledtext
 import datetime
 import os
 from client_mqtt import MQTTClient
-
 from get_data import *
+from hepler import save_enc_data
 
 class GetData(object):
     def registrationInfo(self):
@@ -39,10 +39,13 @@ class Container(tk.Tk):
         # tk.title("Python GUI")
         # win = tk.Tk()               # Create instance 
         self.winfo_toplevel().title("Sheikh Rasel Digital Lab")
+        self.device_uid = str
+        # self.device_uid = '76f08fa6-93e0-4314-96ff-f772fd3ed5d1'
 
         WIDTH = 600
         HEIGHT = 400
-        FrameBack = '#a19eae'
+        FrameColor = '#a19eae'
+        ButtonColor = '#555c9c'
 
         canvas = tk.Canvas(self, height=HEIGHT, width=WIDTH)
         canvas.pack()
@@ -51,14 +54,14 @@ class Container(tk.Tk):
         background_label = tk.Label(master=self, image=self.background_image)
         background_label.place(relwidth=1, relheight=1)
 
-        container = tk.Frame(self, bg=FrameBack, bd=5)
+        container = tk.Frame(self, bg=FrameColor, bd=5)
         container.place(relx=0.5, rely=0.10, relwidth=0.80, relheight=0.80, anchor='n')
 
         self.frames = {}
 
         for F in (LoginPage, LabIDPage, InfoPage, ErrorPage):
             print(F)
-            frame = F(container, self, FrameBack)
+            frame = F(container, self, FrameColor, ButtonColor)
             self.frames[F] = frame
 
             frame.place(relwidth=1, relheight=1)
@@ -78,26 +81,26 @@ def qf(param):
     print(param)
 
 class LoginPage(tk.Frame):
-    def __init__(self, parent, controller, FrameBack):
-        tk.Frame.__init__(self, parent, bg=FrameBack)
+    def __init__(self, parent, controller, FrameColor, ButtonColor):
+        tk.Frame.__init__(self, parent, bg=FrameColor)
 
-        label = tk.Label(self, bg=FrameBack, font=('Courier', 22), text="Login", justify='left')
+        label = tk.Label(self, bg=FrameColor, font=('Courier', 22), text="Login", justify='left')
         label.place(relwidth=1, relheight=0.2)
 
-        userIDLabel = tk.Label(self, bg=FrameBack, font=('Courier', 15), text="UserID:", justify='left')
+        userIDLabel = tk.Label(self, bg=FrameColor, font=('Courier', 15), text="UserID:", justify='left')
         userIDLabel.place(relx=0.03, rely=0.25, relwidth=0.3, relheight=0.12, anchor='nw')
 
         userIDEntry = tk.Entry(self, font=('Courier', 15))
         userIDEntry.place(relx=0.30, rely=0.25, relwidth=0.6, relheight=0.12)
 
 
-        passwordLabel = tk.Label(self, bg=FrameBack, font=('Courier', 15), text="Password:", justify='left')
+        passwordLabel = tk.Label(self, bg=FrameColor, font=('Courier', 15), text="Password:", justify='left')
         passwordLabel.place(relx=0.03, rely=0.45, relwidth=0.3, relheight=0.12, anchor='nw')
 
         passwordEntry = tk.Entry(self, font=('Courier', 15), show="*",)
         passwordEntry.place(relx=0.30, rely=0.45, relwidth=0.6, relheight=0.12)
 
-        button = tk.Button(self, text="Submit", font=('Courier', 12), bg="#555c9c", command=lambda: get_info(userIDEntry.get(), passwordEntry.get(), controller))
+        button = tk.Button(self, text="Submit", font=('Courier', 12), bg=ButtonColor, command=lambda: get_info(userIDEntry.get(), passwordEntry.get(), controller))
         button.place(relx=0.35, rely=0.70, relheight=0.15, relwidth=0.4)
 
         def get_info(userid, password, controller):
@@ -105,10 +108,14 @@ class LoginPage(tk.Frame):
 
             # mqtt start
             client = MQTTClient()
-            info = {"userid" : userid, "password": password}
-            client.on_publish('srdl/login/', info)
+            mac_info = mac_addr()
+            info = {"mac_addr" : mac_info, "userid" : userid, "password": password}
+            client.on_subscribe(f'srdl/res_login/{mac_info}/')
+            client.on_publish('srdl/req_login/', info)
             client.on_loop_forever()
-            result = client.result
+            result = eval(client.msg['result'])
+            device_uid = client.msg['device_uid']
+            controller.device_uid = device_uid
             # mqtt end
 
             if result:
@@ -119,32 +126,33 @@ class LoginPage(tk.Frame):
             
 
 class LabIDPage(tk.Frame):
-    def __init__(self, parent, controller, FrameBack):
-        tk.Frame.__init__(self, parent, bg=FrameBack)
+    def __init__(self, parent, controller, FrameColor, ButtonColor):
+        tk.Frame.__init__(self, parent, bg=FrameColor)
 
-        label = tk.Label(self, bg=FrameBack, font=('Courier', 22), text="Lab ID", justify='left')
+        label = tk.Label(self, bg=FrameColor, font=('Courier', 22), text="Lab ID", justify='left')
         label.place(relwidth=1, relheight=0.2)
 
-        labIDLabel = tk.Label(self, bg=FrameBack, font=('Courier', 15), text="LabID:", justify='left')
+        labIDLabel = tk.Label(self, bg=FrameColor, font=('Courier', 15), text="LabID:", justify='left')
         labIDLabel.place(relx=0.03, rely=0.25, relwidth=0.3, relheight=0.12, anchor='nw')
 
         labIDEntry = tk.Entry(self, font=('Courier', 15))
         labIDEntry.place(relx=0.30, rely=0.25, relwidth=0.6, relheight=0.12)
 
-        button = tk.Button(self, text="Submit", font=('Courier', 12), bg="#749492", command=lambda: get_info(labIDEntry.get(), controller))
+        button = tk.Button(self, text="Submit", font=('Courier', 12), bg=ButtonColor, command=lambda: get_info(labIDEntry.get(), controller))
         button.place(relx=0.35, rely=0.70, relheight=0.15, relwidth=0.4)
 
         def get_info(labid, controller):
             print(f'lab ID {labid}')
-
-
-            
             # mqtt start
             client = MQTTClient()
-            info = {"labid" : labid}
-            client.on_publish('srdl/labid/', info)
+            mac_info = mac_addr()
+            device_uid = controller.device_uid
+            info = {"mac_addr": mac_info, "device_uid": device_uid, "labid" : labid}
+            client.on_subscribe(f'srdl/res_lab/{device_uid}/')
+            client.on_publish(f'srdl/req_lab/{device_uid}/', info)
             client.on_loop_forever()
-            result = client.result
+            result = eval(client.msg['result'])
+            print('result', result)
             # mqtt end
 
             if result:
@@ -155,8 +163,8 @@ class LabIDPage(tk.Frame):
 
 
 class InfoPage(tk.Frame):
-    def __init__(self, parent, controller, FrameBack):
-        tk.Frame.__init__(self, parent, bg=FrameBack)
+    def __init__(self, parent, controller, FrameColor, ButtonColor):
+        tk.Frame.__init__(self, parent, bg=FrameColor)
 
         def on_configure(event):
             canvas.configure(scrollregion=canvas.bbox('all'))
@@ -173,7 +181,6 @@ class InfoPage(tk.Frame):
         scrolly = tk.Scrollbar(self, command=canvas.yview)
         scrolly.place(relx=1, rely=0, relheight=1, anchor='ne')
         canvas.configure(yscrollcommand=scrolly.set)
-
 
         get_data = GetData()
         data = get_data.registrationInfo()
@@ -230,7 +237,7 @@ class InfoPage(tk.Frame):
         space = tk.Label(frame, font=('Courier', 14), text="", justify='left', anchor='w')
         space.pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
 
-        button = tk.Button(frame, text="Submit", font=('Courier', 12), bg="#749492", command=lambda: get_info(res_info, controller))
+        button = tk.Button(frame, text="Submit", font=('Courier', 12), bg=ButtonColor, command=lambda: get_info(res_info, controller))
         button.pack(side = tk.RIGHT, fill=tk.BOTH, expand=tk.FALSE)
 
         def get_info(info, controller):
@@ -239,28 +246,25 @@ class InfoPage(tk.Frame):
             # mqtt start
             client = MQTTClient()
             info = {"info" : info}
-            client.on_publish('srdl/reginfo/', info)
+            device_uid = controller.device_uid
+            client.on_subscribe(f'srdl/res_reg/{device_uid}/')
+            client.on_publish(f'srdl/req_reg/{device_uid}/', info)
             client.on_loop_forever()
-            result = client.result
+            result = eval(client.msg['result'])
+            time_frame = client.msg['time_frame']
             # mqtt end
 
             if result:
                 print('result', result)
-                device_uuid = '09101u32cnwc0'
-                auth_token = f'this is auth token of device id {device_uuid}'
+                auth_token = f'this is auth token of device id {device_uid}'
                 today = datetime.datetime.now()
                 token_obj = {
-                    "device_uuid": device_uuid,
+                    "device_uuid": device_uid,
                     "auth_token": auth_token,
-                    "date": today
+                    "date": today,
+                    "time_frame": time_frame
                 }
-                dirPath = os.path.dirname(os.path.abspath(__file__))
-                fileWrite = open(f"{dirPath}/config/conf-01.txt", "w")
-                def enc(str):
-	                return ' '.join(bin(ord(char)).split('b')[1].rjust(8, '0') for char in str)
-                token_obj = enc(str(token_obj))
-                fileWrite.write(token_obj)
-                fileWrite.close()
+                save_enc_data(token_obj)
 
                 # controller.show_frame(LabIDPage)
                 app.quit()
@@ -271,8 +275,8 @@ class InfoPage(tk.Frame):
 
 
 class ErrorPage(tk.Frame):
-    def __init__(self, parent, controller, FrameBack):
-        tk.Frame.__init__(self, parent, bg=FrameBack)
+    def __init__(self, parent, controller, FrameColor, ButtonColor):
+        tk.Frame.__init__(self, parent, bg=FrameColor)
         label = tk.Label(self, text="Something went wrong. Please try again", fg="red")
         label.pack(pady=10, padx=10)
 

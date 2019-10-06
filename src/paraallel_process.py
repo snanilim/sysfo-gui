@@ -2,6 +2,7 @@ from multiprocessing import Pool
 from time import sleep
 import os, ast, json
 import datetime
+from hepler import *
 
 # all your methods declarations above go here
 # (...)
@@ -10,19 +11,9 @@ ovalue = 0
 
 def loginProcess(largefile):
     try:
-        dirPath = os.path.dirname(os.path.abspath(__file__))
-        fileRead = open(f"{dirPath}/config/conf-01.txt", "r")
-        data = fileRead.read()
-
+        data = has_data_on_file()
         if data:
-            def normalize(str):
-                str = str.replace(' ', '')
-                return " ".join(str[i:i+8] for i in range(0, len(str), 8))
-            def dec(str):
-                str = normalize(str)
-                return ''.join(chr(int(binary, 2)) for binary in str.split(' '))
-
-            token_obj = dec(str(data))
+            token_obj = get_dec_data(data)
             print('token_obj', token_obj)
             token_obj = token_obj.replace("'", "\"")
             token_obj = eval(token_obj)

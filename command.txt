@@ -10,14 +10,28 @@ MQTT:---------------------------------------
 broker.hivemq.com
 
 subscribe:
-srdl/login/
-srdl/labid/
-srdl/reginfo/
+srdl/req_login/
+srdl/req_lab/76f08fa6-93e0-4314-96ff-f772fd3ed5d1/
+srdl/req_reg/76f08fa6-93e0-4314-96ff-f772fd3ed5d1/
 
 publish:
-srdl/res_login/
-
+srdl/res_login/d8:5d:e2:2f:de:bf/
 response:
 {
-   "result": "True"
+   "auth": 1,
+   "result": "True",
+   "device_uid": "76f08fa6-93e0-4314-96ff-f772fd3ed5d1"
+}
+
+srdl/res_lab/76f08fa6-93e0-4314-96ff-f772fd3ed5d1/
+{
+   "auth": 1,
+   "result": "True",
+}
+
+srdl/res_reg/76f08fa6-93e0-4314-96ff-f772fd3ed5d1/
+{
+   "auth": 1,
+   "result": "True",
+   "time_frame": 600
 }
