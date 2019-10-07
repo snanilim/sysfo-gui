@@ -11,7 +11,7 @@ import datetime
 import os
 from client_mqtt import MQTTClient
 from get_data import *
-from hepler import save_enc_data
+from helper import save_enc_data
 
 class GetData(object):
     def registrationInfo(self):
@@ -40,6 +40,7 @@ class Container(tk.Tk):
         # win = tk.Tk()               # Create instance 
         self.winfo_toplevel().title("Sheikh Rasel Digital Lab")
         self.device_uid = str
+        self.dirPath = str
         # self.device_uid = '76f08fa6-93e0-4314-96ff-f772fd3ed5d1'
 
         WIDTH = 600
@@ -108,6 +109,7 @@ class LoginPage(tk.Frame):
 
             # mqtt start
             client = MQTTClient()
+            client.dirPath = controller.dirPath
             mac_info = mac_addr()
             info = {"mac_addr" : mac_info, "userid" : userid, "password": password}
             client.on_subscribe(f'srdl/res_login/{mac_info}/')
@@ -145,6 +147,7 @@ class LabIDPage(tk.Frame):
             print(f'lab ID {labid}')
             # mqtt start
             client = MQTTClient()
+            client.dirPath = controller.dirPath
             mac_info = mac_addr()
             device_uid = controller.device_uid
             info = {"mac_addr": mac_info, "device_uid": device_uid, "labid" : labid}
@@ -245,6 +248,7 @@ class InfoPage(tk.Frame):
 
             # mqtt start
             client = MQTTClient()
+            client.dirPath = controller.dirPath
             info = {"info" : info}
             device_uid = controller.device_uid
             client.on_subscribe(f'srdl/res_reg/{device_uid}/')
@@ -264,10 +268,10 @@ class InfoPage(tk.Frame):
                     "date": today,
                     "time_frame": time_frame
                 }
-                save_enc_data(token_obj)
+                save_enc_data(token_obj, controller.dirPath)
 
                 # controller.show_frame(LabIDPage)
-                app.quit()
+                controller.quit()
                 print('quit')
                 
             else:
@@ -284,12 +288,20 @@ class ErrorPage(tk.Frame):
         button1.pack()
 
 
+def run_ooplogin(dirPath):
+    app = Container()
+    app.dirPath = dirPath
+    app.mainloop()
+    app.destroy()
+    client = MQTTClient()
+    client.dirPath = dirPath
+    client.on_loop_forever()
 
 
-
-app = Container()
-app.mainloop()
-app.destroy()
-client = MQTTClient()
-client.on_loop_forever()
+if __name__ == "__main__":
+    app = Container()
+    app.mainloop()
+    app.destroy()
+    client = MQTTClient()
+    client.on_loop_forever()
 

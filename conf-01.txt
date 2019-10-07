@@ -1,1 +1,0 @@
-{'device_uuid': '09101u32cnwc0', 'auth_token': 'this is auth token of device id 09101u32cnwc0', 'date': datetime.date(2019, 10, 3)}

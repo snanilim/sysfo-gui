@@ -6,6 +6,7 @@ import ast
 
 class CountEntry(object):
     def __init__(self, *args, **kwargs):
+        self.dirPath = str
         self.mintIncrement = 1
         self.mouse_click_count = 0
         self.key_press_count = 0
@@ -20,13 +21,13 @@ class CountEntry(object):
 
         if presentTime > self.addedTime:
 
-            fileRead = open("./idlefile.txt", "r")
+            fileRead = open(f"{self.dirPath}/config/idlefile.txt", "r")
             data = fileRead.read()
             data = ast.literal_eval(data)
             clickCount = data['click']
             pressCount = data['press']
             
-            fileWrite = open("./idlefile.txt", "w")
+            fileWrite = open(f"{self.dirPath}/config/idlefile.txt", "w")
             message = {
                 "click": clickCount + self.mouse_click_count,
                 "press": pressCount + self.key_press_count

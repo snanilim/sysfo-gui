@@ -1,11 +1,12 @@
 import paho.mqtt.client as mqtt
-import uuid, json, os
+import uuid, json, os, ast
 import datetime
-from hepler import *
+from helper import *
 
 
 class MQTTClient(object):
     def __init__(self, *args, **kwargs):
+        self.dirPath = str
         try:
             uuid.uuid4
             r = str(uuid.uuid4())
@@ -34,24 +35,29 @@ class MQTTClient(object):
 
         msg_data = json.loads(msg)
         auth_value = msg_data.get("auth", "")
+        info_value = msg_data.get("info", "")
 
-        data = has_data_on_file()
+        conf_data = has_data_on_file(self.dirPath)
 
-        if data:
-            print('msg', msg)
+        if conf_data:
+            if 'info' in msg_data and info_value == 1:
+                self.get_and_send_data(msg_data)
         elif 'auth' in msg_data and auth_value == 1:
             self.msg = msg_data
-            # value = msg_data.get("result", "")
-            # device_uid = msg_data.get("device_uid", "")
-            # time_frame = msg_data.get("time_frame", "")
-            # self.result = eval(value)
-            # self.device_uid = device_uid
-            # self.time_frame = time_frame
             self.on_loop_stop()
 
     def on_connect(self, client, userdata, flags, rc):
         print("Connected with result code " + str(rc))
-        self.client.subscribe("srdl/res_login/", 1)
+        self.client.subscribe("srdl/req_info/", 1)
+        conf_data = has_data_on_file(self.dirPath)
+        if conf_data:
+            token_obj = get_dec_data(conf_data)
+            token_obj = token_obj.replace("'", "\"")
+            token_obj = eval(token_obj)
+            device_uuid = token_obj['device_uuid']
+            print('token_obj', device_uuid)
+            self.client.subscribe(f"srdl/req_info/{device_uuid}/", 1)
+
 
     def on_subscribe(self, topicUri):
         self.client.subscribe(topicUri, 1)
@@ -70,3 +76,25 @@ class MQTTClient(object):
         print('work')
         self.client.loop_stop()
         self.client.disconnect()
+
+
+    def get_and_send_data(self, msg_data):
+        print('msg_data', msg_data)
+        mypath = f"{self.dirPath}/config/file"
+        all_info = []
+        for (dirpath, dirnames, filenames) in os.walk(mypath):
+            for fileName in filenames:
+                print('filename', fileName)
+                print('fileRead', f"{mypath}/{fileName}")
+                fileRead = open(f"{mypath}/{fileName}", "r")
+                
+                data = fileRead.read()
+                data = ast.literal_eval(data)
+                all_info.append(data)
+            break
+        topic = all_info
+        topic_dump = json.dumps(topic)
+        self.client.publish("srdl/res_info/76f08fa6-93e0-4314-96ff-f772fd3ed5d1/", topic_dump)
+        print('f', all_info)
+
+        

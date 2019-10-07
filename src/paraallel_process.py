@@ -2,7 +2,7 @@ from multiprocessing import Pool
 from time import sleep
 import os, ast, json
 import datetime
-from hepler import *
+from helper import *
 
 # all your methods declarations above go here
 # (...)
@@ -11,41 +11,47 @@ ovalue = 0
 
 def loginProcess(largefile):
     try:
-        data = has_data_on_file()
+        dirPath = os.path.dirname(os.path.abspath(__file__))
+        data = has_data_on_file(dirPath)
         if data:
             token_obj = get_dec_data(data)
-            print('token_obj', token_obj)
             token_obj = token_obj.replace("'", "\"")
             token_obj = eval(token_obj)
             token_value = token_obj['auth_token']
-            print('token_obj', token_value)
 
             if token_value:
                 print('hello')
                 from client_mqtt import MQTTClient
                 client = MQTTClient()
+                client.dirPath = dirPath
                 client.on_loop_forever()
             else:
-                import oopLogin
+                from oopLogin import run_ooplogin
+                run_ooplogin(dirPath)
         else:
-            import oopLogin
+            from oopLogin import run_ooplogin
+            run_ooplogin(dirPath)
         return True
     except Exception as error:
         print('error', error)
-        import oopLogin
+        from oopLogin import run_ooplogin
+        run_ooplogin(dirPath)
         return False
         # pass
 
 
 def countProcess(bigfile):
+    dirPath = os.path.dirname(os.path.abspath(__file__))
     from count_entry import CountEntry
     count = CountEntry()
+    count.dirPath = dirPath
     count.mainListener()
     return True
 
 def runSchedule(integer):
+    dirPath = os.path.dirname(os.path.abspath(__file__))
     from run_scheduler import run_schedule
-    run_schedule()
+    run_schedule(dirPath)
     return True
 
 def FinalProcess(parsed,pattern,calc_results):
@@ -57,8 +63,8 @@ def FinalProcess(parsed,pattern,calc_results):
 def main():
     pool = Pool(processes=3)
     runMqtt = pool.apply_async(loginProcess, ['largefile'])
-    # runCountEntry = pool.apply_async(countProcess, [ovalue])
-    # runSchedul = pool.apply_async(runSchedule, [ovalue])
+    runCountEntry = pool.apply_async(countProcess, [ovalue])
+    runSchedul = pool.apply_async(runSchedule, [ovalue])
 
     pool.close()
     pool.join()
