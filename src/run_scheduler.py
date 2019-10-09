@@ -16,15 +16,16 @@ def get_info(sc, dirPath):
         data = {
             "info": 1,
             "status": 1,
-            "idle": 0, # need do be done later
             "cpu": 1,
             "memory": 1,
             "disk": 1,
-            "process": 0,
+            "process": 1,
             "network": 1
         }
         res_info = getData(data)
-        # print('res_info', res_info)
+        idle_time = getIdleTime(dirPath)
+        res_info.update({'idle': idle_time})
+        # print('idle_time', idle_time)
 
 
 
@@ -41,6 +42,9 @@ def get_info(sc, dirPath):
 
         # get present time and write res_info with the time
         time = datetime.datetime.strptime(format(datetime.datetime.now()), '%Y-%m-%d %H:%M:%S.%f')
+        now = datetime.datetime.now()
+        timestamp = datetime.datetime.timestamp(time)
+        res_info.update({'timestamp': timestamp})
         date_time = str(time.year) + "-" + str(time.month) + "-" + str(time.day) + "-" + str(time.hour) + "-" + str(time.minute)
         
         f = open(f"{dirPath}/config/file/file-{date_time}.txt", "w")

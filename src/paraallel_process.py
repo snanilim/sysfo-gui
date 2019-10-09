@@ -22,7 +22,7 @@ def loginProcess(largefile):
             if token_value:
                 print('hello')
                 from client_mqtt import MQTTClient
-                client = MQTTClient()
+                client = MQTTClient(dirPath)
                 client.dirPath = dirPath
                 client.on_loop_forever()
             else:

@@ -105,26 +105,30 @@ class LoginPage(tk.Frame):
         button.place(relx=0.35, rely=0.70, relheight=0.15, relwidth=0.4)
 
         def get_info(userid, password, controller):
-            print(f'user ID {userid}, password {password}')
+            try:
+                print(f'user ID {userid}, password {password}')
 
-            # mqtt start
-            client = MQTTClient()
-            client.dirPath = controller.dirPath
-            mac_info = mac_addr()
-            info = {"mac_addr" : mac_info, "userid" : userid, "password": password}
-            client.on_subscribe(f'srdl/res_login/{mac_info}/')
-            client.on_publish('srdl/req_login/', info)
-            client.on_loop_forever()
-            result = eval(client.msg['result'])
-            device_uid = client.msg['device_uid']
-            controller.device_uid = device_uid
-            # mqtt end
+                # mqtt start
+                client = MQTTClient(controller.dirPath)
+                client.dirPath = controller.dirPath
+                mac_info = mac_addr()
+                info = {"mac_addr" : mac_info, "userid" : userid, "password": password}
+                client.on_subscribe(f'srdl/res_login/{mac_info}/')
+                client.on_publish('srdl/req_login/', info)
+                client.on_loop_forever()
+                print('client.msg', client.msg)
+                result = eval(client.msg['result'])
+                device_uid = client.msg['device_uid']
+                controller.device_uid = device_uid
+                # mqtt end
 
-            if result:
-                print('result', result)
-                controller.show_frame(LabIDPage)
-            else:
-                controller.show_frame(ErrorPage)
+                if result:
+                    print('result', result)
+                    controller.show_frame(LabIDPage)
+                else:
+                    controller.show_frame(ErrorPage)
+            except Exception as error:
+                print('error', error)
             
 
 class LabIDPage(tk.Frame):
@@ -146,7 +150,7 @@ class LabIDPage(tk.Frame):
         def get_info(labid, controller):
             print(f'lab ID {labid}')
             # mqtt start
-            client = MQTTClient()
+            client = MQTTClient(controller.dirPath)
             client.dirPath = controller.dirPath
             mac_info = mac_addr()
             device_uid = controller.device_uid
@@ -247,7 +251,7 @@ class InfoPage(tk.Frame):
             print(f'lab ID {info}')
 
             # mqtt start
-            client = MQTTClient()
+            client = MQTTClient(controller.dirPath)
             client.dirPath = controller.dirPath
             info = {"info" : info}
             device_uid = controller.device_uid
@@ -293,7 +297,7 @@ def run_ooplogin(dirPath):
     app.dirPath = dirPath
     app.mainloop()
     app.destroy()
-    client = MQTTClient()
+    client = MQTTClient(dirPath)
     client.dirPath = dirPath
     client.on_loop_forever()
 

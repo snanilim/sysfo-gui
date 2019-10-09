@@ -68,13 +68,13 @@ def _getNetworkInfo():
     return net_obj
 
 
-def _getStatus():
+def getStatus():
     return "online"
 
 
-def _getIdleTime():
+def getIdleTime(dirPath):
     if platform.system() == 'Linux':
-        idle_time = os.path.getmtime("idlefile.txt")
+        idle_time = os.path.getmtime(f"{dirPath}/config/idlefile.txt")
         return idle_time
     elif platform.system() == 'Windows':
         from ctypes import Structure, windll, c_uint, sizeof, byref
@@ -115,15 +115,15 @@ def getData(data):
     status_value = data.get("status", "")
     if 'status' in data and status_value == 1:
         # status info
-        status_info = _getStatus()
+        status_info = getStatus()
         all_info.update({'status': status_info})
 
 
-    idle_value = data.get("idle", "")
-    if 'idle' in data and idle_value == 1:
-        # idle info
-        idle_info = _getIdleTime()
-        all_info.update({'idle': idle_info})
+    # idle_value = data.get("idle", "")
+    # if 'idle' in data and idle_value == 1:
+    #     # idle info
+    #     idle_info = getIdleTime()
+    #     all_info.update({'idle': idle_info})
 
 
     cpu_value = data.get("cpu", "")
