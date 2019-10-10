@@ -15,6 +15,7 @@ srdl/req_lab/76f08fa6-93e0-4314-96ff-f772fd3ed5d1/
 srdl/req_reg/76f08fa6-93e0-4314-96ff-f772fd3ed5d1/
 srdl/res_info/76f08fa6-93e0-4314-96ff-f772fd3ed5d1/
 srdl/res_idle_status/76f08fa6-93e0-4314-96ff-f772fd3ed5d1/
+srdl/res_offline/76f08fa6-93e0-4314-96ff-f772fd3ed5d1/
 
 publish:
 srdl/res_login/d8:5d:e2:2f:de:bf/

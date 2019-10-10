@@ -41,18 +41,26 @@ def loginProcess(largefile):
 
 
 def countProcess(bigfile):
-    dirPath = os.path.dirname(os.path.abspath(__file__))
-    from count_entry import CountEntry
-    count = CountEntry()
-    count.dirPath = dirPath
-    count.mainListener()
-    return True
+    try:
+        dirPath = os.path.dirname(os.path.abspath(__file__))
+        from count_entry import CountEntry
+        count = CountEntry()
+        count.dirPath = dirPath
+        count.mainListener()
+        return True
+    except Exception as error:
+        print('Error', error)
+    
 
 def runSchedule(integer):
-    dirPath = os.path.dirname(os.path.abspath(__file__))
-    from run_scheduler import run_schedule
-    run_schedule(dirPath)
-    return True
+    try:
+        dirPath = os.path.dirname(os.path.abspath(__file__))
+        from run_scheduler import run_schedule
+        run_schedule(dirPath)
+        return True
+    except Exception as error:
+        print('Error', error)
+    
 
 def FinalProcess(parsed,pattern,calc_results):
     print('Start of process f')                                                                          

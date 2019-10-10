@@ -35,10 +35,9 @@ class MQTTClient(object):
 
                 offline_dump = json.dumps(offline)
                 self.client.will_set(f"srdl/res_offline/{device_uuid}/", payload = offline_dump, qos=1, retain=False)
-            # self.client.will_set = self.on_will_set
-            self.client.on_connect = self.on_connect
             
-
+            
+            self.client.on_connect = self.on_connect
             self.client.on_message = self.on_message
             self.client.connect(self.BROKER_IP, self.PORT, 60)
 
@@ -80,36 +79,35 @@ class MQTTClient(object):
         except Exception as error:
             print('error', error)
 
-    def on_will_set(self, topic, payload, qos, retain):
-        offline = {
-            "status": "offline"
-        }
-        offline_dump = json.dumps(offline)
-        self.client.will_set(f"srdl/res_offline/", payload = offline_dump, qos=1, retain=False)
-
 
     def on_connect(self, client, userdata, flags, rc):
-        print("Connected with result code " + str(rc))
-        # self.client.subscribe("srdl/req_info/", 1)
-        conf_data = has_data_on_file(self.dirPath)
-        if conf_data:
-            token_obj = get_dec_data(conf_data)
-            token_obj = token_obj.replace("'", "\"")
-            token_obj = eval(token_obj)
-            device_uuid = token_obj['device_uuid']
-            print('token_obj', device_uuid)
-            self.client.subscribe(f"srdl/req_info/{device_uuid}/", 1)
-            self.client.subscribe(f"srdl/req_idle_status/{device_uuid}/", 1)
+        try:
+            print("Connected with result code " + str(rc))
+            # self.client.subscribe("srdl/req_info/", 1)
+            conf_data = has_data_on_file(self.dirPath)
+            if conf_data:
+                token_obj = get_dec_data(conf_data)
+                token_obj = token_obj.replace("'", "\"")
+                token_obj = eval(token_obj)
+                device_uuid = token_obj['device_uuid']
+                print('token_obj', device_uuid)
+                self.client.subscribe(f"srdl/req_info/{device_uuid}/", 1)
+                self.client.subscribe(f"srdl/req_idle_status/{device_uuid}/", 1)
+        except Exception as error:
+            print('error', error)
 
 
     def on_subscribe(self, topicUri):
         self.client.subscribe(topicUri, 1)
 
     def on_publish(self, topicUri, message):
-        topic = message
-        topic_dump = json.dumps(topic)
-        self.client.publish(topicUri, topic_dump)
-        print('Publish')
+        try:
+            topic = message
+            topic_dump = json.dumps(topic)
+            self.client.publish(topicUri, topic_dump)
+            print('Publish')
+        except Exception as error:
+            print('error', error)
 
     def on_loop_forever(self):
         print('work')

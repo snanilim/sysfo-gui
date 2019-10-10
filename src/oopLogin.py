@@ -35,40 +35,43 @@ class GetData(object):
 
 class Container(tk.Tk):
     def __init__(self, *args, **kwargs):
-        tk.Tk.__init__(self, *args, **kwargs)
-        # tk.title("Python GUI")
-        # win = tk.Tk()               # Create instance 
-        self.winfo_toplevel().title("Sheikh Rasel Digital Lab")
-        self.device_uid = str
-        self.dirPath = str
-        # self.device_uid = '76f08fa6-93e0-4314-96ff-f772fd3ed5d1'
+        try:
+            tk.Tk.__init__(self, *args, **kwargs)
+            # tk.title("Python GUI")
+            # win = tk.Tk()               # Create instance 
+            self.winfo_toplevel().title("Sheikh Rasel Digital Lab")
+            self.device_uid = str
+            self.dirPath = str
+            # self.device_uid = '76f08fa6-93e0-4314-96ff-f772fd3ed5d1'
 
-        WIDTH = 600
-        HEIGHT = 400
-        FrameColor = '#a19eae'
-        ButtonColor = '#555c9c'
+            WIDTH = 600
+            HEIGHT = 400
+            FrameColor = '#a19eae'
+            ButtonColor = '#555c9c'
 
-        canvas = tk.Canvas(self, height=HEIGHT, width=WIDTH)
-        canvas.pack()
+            canvas = tk.Canvas(self, height=HEIGHT, width=WIDTH)
+            canvas.pack()
 
-        self.background_image = tk.PhotoImage(file="./img/login-background-8.png")
-        background_label = tk.Label(master=self, image=self.background_image)
-        background_label.place(relwidth=1, relheight=1)
+            self.background_image = tk.PhotoImage(file="./img/login-background-8.png")
+            background_label = tk.Label(master=self, image=self.background_image)
+            background_label.place(relwidth=1, relheight=1)
 
-        container = tk.Frame(self, bg=FrameColor, bd=5)
-        container.place(relx=0.5, rely=0.10, relwidth=0.80, relheight=0.80, anchor='n')
+            container = tk.Frame(self, bg=FrameColor, bd=5)
+            container.place(relx=0.5, rely=0.10, relwidth=0.80, relheight=0.80, anchor='n')
 
-        self.frames = {}
+            self.frames = {}
 
-        for F in (LoginPage, LabIDPage, InfoPage, ErrorPage):
-            print(F)
-            frame = F(container, self, FrameColor, ButtonColor)
-            self.frames[F] = frame
+            for F in (LoginPage, LabIDPage, InfoPage, ErrorPage):
+                print(F)
+                frame = F(container, self, FrameColor, ButtonColor)
+                self.frames[F] = frame
 
-            frame.place(relwidth=1, relheight=1)
+                frame.place(relwidth=1, relheight=1)
 
-        self.show_frame(LoginPage)
-        # self.show_frame(InfoPage)
+            self.show_frame(LoginPage)
+            # self.show_frame(InfoPage)
+        except Exception as error:
+            print('error', error)
 
     def show_frame(self, cont):
         print('cont', cont)
@@ -83,26 +86,29 @@ def qf(param):
 
 class LoginPage(tk.Frame):
     def __init__(self, parent, controller, FrameColor, ButtonColor):
-        tk.Frame.__init__(self, parent, bg=FrameColor)
+        try:
+            tk.Frame.__init__(self, parent, bg=FrameColor)
 
-        label = tk.Label(self, bg=FrameColor, font=('Courier', 22), text="Login", justify='left')
-        label.place(relwidth=1, relheight=0.2)
+            label = tk.Label(self, bg=FrameColor, font=('Courier', 22), text="Login", justify='left')
+            label.place(relwidth=1, relheight=0.2)
 
-        userIDLabel = tk.Label(self, bg=FrameColor, font=('Courier', 15), text="UserID:", justify='left')
-        userIDLabel.place(relx=0.03, rely=0.25, relwidth=0.3, relheight=0.12, anchor='nw')
+            userIDLabel = tk.Label(self, bg=FrameColor, font=('Courier', 15), text="UserID:", justify='left')
+            userIDLabel.place(relx=0.03, rely=0.25, relwidth=0.3, relheight=0.12, anchor='nw')
 
-        userIDEntry = tk.Entry(self, font=('Courier', 15))
-        userIDEntry.place(relx=0.30, rely=0.25, relwidth=0.6, relheight=0.12)
+            userIDEntry = tk.Entry(self, font=('Courier', 15))
+            userIDEntry.place(relx=0.30, rely=0.25, relwidth=0.6, relheight=0.12)
 
 
-        passwordLabel = tk.Label(self, bg=FrameColor, font=('Courier', 15), text="Password:", justify='left')
-        passwordLabel.place(relx=0.03, rely=0.45, relwidth=0.3, relheight=0.12, anchor='nw')
+            passwordLabel = tk.Label(self, bg=FrameColor, font=('Courier', 15), text="Password:", justify='left')
+            passwordLabel.place(relx=0.03, rely=0.45, relwidth=0.3, relheight=0.12, anchor='nw')
 
-        passwordEntry = tk.Entry(self, font=('Courier', 15), show="*",)
-        passwordEntry.place(relx=0.30, rely=0.45, relwidth=0.6, relheight=0.12)
+            passwordEntry = tk.Entry(self, font=('Courier', 15), show="*",)
+            passwordEntry.place(relx=0.30, rely=0.45, relwidth=0.6, relheight=0.12)
 
-        button = tk.Button(self, text="Submit", font=('Courier', 12), bg=ButtonColor, command=lambda: get_info(userIDEntry.get(), passwordEntry.get(), controller))
-        button.place(relx=0.35, rely=0.70, relheight=0.15, relwidth=0.4)
+            button = tk.Button(self, text="Submit", font=('Courier', 12), bg=ButtonColor, command=lambda: get_info(userIDEntry.get(), passwordEntry.get(), controller))
+            button.place(relx=0.35, rely=0.70, relheight=0.15, relwidth=0.4)
+        except Exception as error:
+            print('error', error)
 
         def get_info(userid, password, controller):
             try:
@@ -133,70 +139,79 @@ class LoginPage(tk.Frame):
 
 class LabIDPage(tk.Frame):
     def __init__(self, parent, controller, FrameColor, ButtonColor):
-        tk.Frame.__init__(self, parent, bg=FrameColor)
+        try:
+            tk.Frame.__init__(self, parent, bg=FrameColor)
 
-        label = tk.Label(self, bg=FrameColor, font=('Courier', 22), text="Lab ID", justify='left')
-        label.place(relwidth=1, relheight=0.2)
+            label = tk.Label(self, bg=FrameColor, font=('Courier', 22), text="Lab ID", justify='left')
+            label.place(relwidth=1, relheight=0.2)
 
-        labIDLabel = tk.Label(self, bg=FrameColor, font=('Courier', 15), text="LabID:", justify='left')
-        labIDLabel.place(relx=0.03, rely=0.25, relwidth=0.3, relheight=0.12, anchor='nw')
+            labIDLabel = tk.Label(self, bg=FrameColor, font=('Courier', 15), text="LabID:", justify='left')
+            labIDLabel.place(relx=0.03, rely=0.25, relwidth=0.3, relheight=0.12, anchor='nw')
 
-        labIDEntry = tk.Entry(self, font=('Courier', 15))
-        labIDEntry.place(relx=0.30, rely=0.25, relwidth=0.6, relheight=0.12)
+            labIDEntry = tk.Entry(self, font=('Courier', 15))
+            labIDEntry.place(relx=0.30, rely=0.25, relwidth=0.6, relheight=0.12)
 
-        button = tk.Button(self, text="Submit", font=('Courier', 12), bg=ButtonColor, command=lambda: get_info(labIDEntry.get(), controller))
-        button.place(relx=0.35, rely=0.70, relheight=0.15, relwidth=0.4)
+            button = tk.Button(self, text="Submit", font=('Courier', 12), bg=ButtonColor, command=lambda: get_info(labIDEntry.get(), controller))
+            button.place(relx=0.35, rely=0.70, relheight=0.15, relwidth=0.4)
+        except Exception as error:
+            print('error', error)
 
         def get_info(labid, controller):
-            print(f'lab ID {labid}')
-            # mqtt start
-            client = MQTTClient(controller.dirPath)
-            client.dirPath = controller.dirPath
-            mac_info = mac_addr()
-            device_uid = controller.device_uid
-            info = {"mac_addr": mac_info, "device_uid": device_uid, "labid" : labid}
-            client.on_subscribe(f'srdl/res_lab/{device_uid}/')
-            client.on_publish(f'srdl/req_lab/{device_uid}/', info)
-            client.on_loop_forever()
-            result = eval(client.msg['result'])
-            print('result', result)
-            # mqtt end
-
-            if result:
+            try:
+                print(f'lab ID {labid}')
+                # mqtt start
+                client = MQTTClient(controller.dirPath)
+                client.dirPath = controller.dirPath
+                mac_info = mac_addr()
+                device_uid = controller.device_uid
+                info = {"mac_addr": mac_info, "device_uid": device_uid, "labid" : labid}
+                client.on_subscribe(f'srdl/res_lab/{device_uid}/')
+                client.on_publish(f'srdl/req_lab/{device_uid}/', info)
+                client.on_loop_forever()
+                result = eval(client.msg['result'])
                 print('result', result)
-                controller.show_frame(InfoPage)
-            else:
-                controller.show_frame(ErrorPage)
+                # mqtt end
+
+                if result:
+                    print('result', result)
+                    controller.show_frame(InfoPage)
+                else:
+                    controller.show_frame(ErrorPage)
+            except Exception as error:
+                print('error', error)
 
 
 class InfoPage(tk.Frame):
     def __init__(self, parent, controller, FrameColor, ButtonColor):
-        tk.Frame.__init__(self, parent, bg=FrameColor)
+        try:
+            tk.Frame.__init__(self, parent, bg=FrameColor)
 
-        def on_configure(event):
-            canvas.configure(scrollregion=canvas.bbox('all'))
+            def on_configure(event):
+                canvas.configure(scrollregion=canvas.bbox('all'))
 
-        canvas = tk.Canvas(self)
-        canvas.place(relx=0, rely=0.2, relheight=0.8, relwidth=1)
+            canvas = tk.Canvas(self)
+            canvas.place(relx=0, rely=0.2, relheight=0.8, relwidth=1)
 
-        frame = tk.Frame(canvas)
-        # resize the canvas scrollregion each time the size of the frame changes
-        frame.bind('<Configure>', on_configure)
-        # display frame inside the canvas
-        canvas.create_window(1, 0, window=frame)
+            frame = tk.Frame(canvas)
+            # resize the canvas scrollregion each time the size of the frame changes
+            frame.bind('<Configure>', on_configure)
+            # display frame inside the canvas
+            canvas.create_window(1, 0, window=frame)
 
-        scrolly = tk.Scrollbar(self, command=canvas.yview)
-        scrolly.place(relx=1, rely=0, relheight=1, anchor='ne')
-        canvas.configure(yscrollcommand=scrolly.set)
+            scrolly = tk.Scrollbar(self, command=canvas.yview)
+            scrolly.place(relx=1, rely=0, relheight=1, anchor='ne')
+            canvas.configure(yscrollcommand=scrolly.set)
 
-        get_data = GetData()
-        data = get_data.registrationInfo()
+            get_data = GetData()
+            data = get_data.registrationInfo()
 
-        res_info = json.dumps(data)
+            res_info = json.dumps(data)
 
-        cpu_info = data['cpu_info']
-        memory_info = data['memory_info']
-        disk_info = data['disk_info']
+            cpu_info = data['cpu_info']
+            memory_info = data['memory_info']
+            disk_info = data['disk_info']
+        except Exception as error:
+            print('error', error)
 
         def bytesTo(bytes, to, bazeSize=1024):
             rangeNum = {'k' : 1, 'm': 2, 'g' : 3, 't' : 4, 'p' : 5, 'e' : 6 }
@@ -248,58 +263,67 @@ class InfoPage(tk.Frame):
         button.pack(side = tk.RIGHT, fill=tk.BOTH, expand=tk.FALSE)
 
         def get_info(info, controller):
-            print(f'lab ID {info}')
+            try:
+                print(f'lab ID {info}')
 
-            # mqtt start
-            client = MQTTClient(controller.dirPath)
-            client.dirPath = controller.dirPath
-            info = {"info" : info}
-            device_uid = controller.device_uid
-            client.on_subscribe(f'srdl/res_reg/{device_uid}/')
-            client.on_publish(f'srdl/req_reg/{device_uid}/', info)
-            client.on_loop_forever()
-            result = eval(client.msg['result'])
-            time_frame = client.msg['time_frame']
-            # mqtt end
+                # mqtt start
+                client = MQTTClient(controller.dirPath)
+                client.dirPath = controller.dirPath
+                info = {"info" : info}
+                device_uid = controller.device_uid
+                client.on_subscribe(f'srdl/res_reg/{device_uid}/')
+                client.on_publish(f'srdl/req_reg/{device_uid}/', info)
+                client.on_loop_forever()
+                result = eval(client.msg['result'])
+                time_frame = client.msg['time_frame']
+                # mqtt end
 
-            if result:
-                print('result', result)
-                auth_token = f'this is auth token of device id {device_uid}'
-                today = datetime.datetime.now()
-                token_obj = {
-                    "device_uuid": device_uid,
-                    "auth_token": auth_token,
-                    "date": today,
-                    "time_frame": time_frame
-                }
-                save_enc_data(token_obj, controller.dirPath)
+                if result:
+                    print('result', result)
+                    auth_token = f'this is auth token of device id {device_uid}'
+                    today = datetime.datetime.now()
+                    token_obj = {
+                        "device_uuid": device_uid,
+                        "auth_token": auth_token,
+                        "date": today,
+                        "time_frame": time_frame
+                    }
+                    save_enc_data(token_obj, controller.dirPath)
 
-                # controller.show_frame(LabIDPage)
-                controller.quit()
-                print('quit')
-                
-            else:
-                controller.show_frame(ErrorPage)
+                    # controller.show_frame(LabIDPage)
+                    controller.quit()
+                    print('quit')
+                    
+                else:
+                    controller.show_frame(ErrorPage)
+            except Exception as error:
+                print('error', error)
 
 
 class ErrorPage(tk.Frame):
     def __init__(self, parent, controller, FrameColor, ButtonColor):
-        tk.Frame.__init__(self, parent, bg=FrameColor)
-        label = tk.Label(self, text="Something went wrong. Please try again", fg="red")
-        label.pack(pady=10, padx=10)
+        try:
+            tk.Frame.__init__(self, parent, bg=FrameColor)
+            label = tk.Label(self, text="Something went wrong. Please try again", fg="red")
+            label.pack(pady=10, padx=10)
 
-        button1 = tk.Button(self, text="Back", command=lambda: controller.show_frame(LoginPage))
-        button1.pack()
+            button1 = tk.Button(self, text="Back", command=lambda: controller.show_frame(LoginPage))
+            button1.pack()
+        except Exception as error:
+            print('error', error)
 
 
 def run_ooplogin(dirPath):
-    app = Container()
-    app.dirPath = dirPath
-    app.mainloop()
-    app.destroy()
-    client = MQTTClient(dirPath)
-    client.dirPath = dirPath
-    client.on_loop_forever()
+    try:
+        app = Container()
+        app.dirPath = dirPath
+        app.mainloop()
+        app.destroy()
+        client = MQTTClient(dirPath)
+        client.dirPath = dirPath
+        client.on_loop_forever()
+    except Exception as error:
+        print('error', error)
 
 
 if __name__ == "__main__":

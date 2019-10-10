@@ -6,52 +6,64 @@ import ast
 
 class CountEntry(object):
     def __init__(self, *args, **kwargs):
-        self.dirPath = str
-        self.mintIncrement = 1
-        self.mouse_click_count = 0
-        self.key_press_count = 0
+        try:
+            self.dirPath = str
+            self.mintIncrement = 1
+            self.mouse_click_count = 0
+            self.key_press_count = 0
 
-        self.today = datetime.today()
-        self.addedTime = self.today + timedelta(minutes=self.mintIncrement)
+            self.today = datetime.today()
+            self.addedTime = self.today + timedelta(minutes=self.mintIncrement)
+        except Exception as error:
+            print('error', error)
 
 
     def _update_count(self):
-        self.today = datetime.today()
-        presentTime = datetime.strptime(format(self.today), '%Y-%m-%d %H:%M:%S.%f')
+        try:
+            self.today = datetime.today()
+            presentTime = datetime.strptime(format(self.today), '%Y-%m-%d %H:%M:%S.%f')
 
-        if presentTime > self.addedTime:
+            if presentTime > self.addedTime:
 
-            fileRead = open(f"{self.dirPath}/config/idlefile.txt", "r")
-            data = fileRead.read()
-            data = ast.literal_eval(data)
-            clickCount = data['click']
-            pressCount = data['press']
-            
-            fileWrite = open(f"{self.dirPath}/config/idlefile.txt", "w")
-            message = {
-                "click": clickCount + self.mouse_click_count,
-                "press": pressCount + self.key_press_count
-            }
-            fileWrite.write(str(message))
-            fileWrite.close()
+                fileRead = open(f"{self.dirPath}/config/idlefile.txt", "r")
+                data = fileRead.read()
+                data = ast.literal_eval(data)
+                clickCount = data['click']
+                pressCount = data['press']
+                
+                fileWrite = open(f"{self.dirPath}/config/idlefile.txt", "w")
+                message = {
+                    "click": clickCount + self.mouse_click_count,
+                    "press": pressCount + self.key_press_count
+                }
+                fileWrite.write(str(message))
+                fileWrite.close()
 
-            self.mouse_click_count = 0
-            self.key_press_count = 0
-            self.addedTime = self.today + timedelta(minutes=self.mintIncrement)
-        return True
+                self.mouse_click_count = 0
+                self.key_press_count = 0
+                self.addedTime = self.today + timedelta(minutes=self.mintIncrement)
+            return True
+        except Exception as error:
+            print('error', error)
 
     def _on_press(self, key):
-        self.key_press_count += 1
-        print('key_press_count', self.key_press_count)
-        self._update_count()
-        return True
+        try:
+            self.key_press_count += 1
+            print('key_press_count', self.key_press_count)
+            self._update_count()
+            return True
+        except Exception as error:
+            print('error', error)
         
 
     def _on_click(self, x, y, button, pressed):
-        self.mouse_click_count += 1
-        print('mouse_click_count', self.mouse_click_count)
-        self._update_count()
-        return True
+        try:
+            self.mouse_click_count += 1
+            print('mouse_click_count', self.mouse_click_count)
+            self._update_count()
+            return True
+        except Exception as error:
+            print('error', error)
 
     def mainListener(self):
         print('call')
