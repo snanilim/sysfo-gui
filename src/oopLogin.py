@@ -9,6 +9,7 @@ import time
 from tkinter import scrolledtext
 import datetime
 import os
+import platform
 from client_mqtt import MQTTClient
 from get_data import *
 from helper import save_enc_data
@@ -44,8 +45,8 @@ class Container(tk.Tk):
             self.dirPath = str
             # self.device_uid = '76f08fa6-93e0-4314-96ff-f772fd3ed5d1'
 
-            WIDTH = 600
-            HEIGHT = 400
+            WIDTH = 650
+            HEIGHT = 450
             FrameColor = '#a19eae'
             ButtonColor = '#555c9c'
 
@@ -230,10 +231,17 @@ class InfoPage(tk.Frame):
         cpu = tk.Label(frame, font=('Courier', 14), text=f"CPU Information:", justify='left', anchor='w')
         cpu.pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
 
-        tk.Label(frame, font=('Courier', 10), text=f"Brand: {cpu_info['brand']}", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
-        tk.Label(frame, font=('Courier', 10), text=f"Manufacturer: {cpu_info['vendor_id']}", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
-        tk.Label(frame, font=('Courier', 10), text=f"Version: {cpu_info['cpuinfo_version']}", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
-        tk.Label(frame, font=('Courier', 10), text=f"Bits: {cpu_info['bits']} bits", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+        if platform.system() == 'Linux':
+            tk.Label(frame, font=('Courier', 10), text=f"Brand: {cpu_info['brand']}", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+            tk.Label(frame, font=('Courier', 10), text=f"Manufacturer: {cpu_info['vendor_id']}", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+            tk.Label(frame, font=('Courier', 10), text=f"Version: {cpu_info['cpuinfo_version']}", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+            tk.Label(frame, font=('Courier', 10), text=f"Bits: {cpu_info['bits']} bits", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+        elif platform.system() == 'Windows':
+            tk.Label(frame, font=('Courier', 10), text=f"Brand: {cpu_info['Name']}", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+            tk.Label(frame, font=('Courier', 10), text=f"Manufacturer: {cpu_info['Manufacturer']}", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+            # tk.Label(frame, font=('Courier', 10), text=f"Version: {cpu_info['cpuinfo_version']}", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+            tk.Label(frame, font=('Courier', 10), text=f"Bits: {cpu_info['AddressWidth']} bits", justify='left', anchor='w').pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
+
 
         space = tk.Label(frame, font=('Courier', 14), text="", justify='left', anchor='w')
         space.pack(side = tk.TOP, fill=tk.BOTH, expand=tk.FALSE)
@@ -269,12 +277,14 @@ class InfoPage(tk.Frame):
                 # mqtt start
                 client = MQTTClient(controller.dirPath)
                 client.dirPath = controller.dirPath
-                info = {"info" : info}
+                # info = {"info" : info}
                 device_uid = controller.device_uid
+                
                 client.on_subscribe(f'srdl/res_reg/{device_uid}/')
                 client.on_publish(f'srdl/req_reg/{device_uid}/', info)
                 client.on_loop_forever()
                 result = eval(client.msg['result'])
+                lab_id = client.msg['lab_id']
                 time_frame = client.msg['time_frame']
                 # mqtt end
 
@@ -286,7 +296,8 @@ class InfoPage(tk.Frame):
                         "device_uuid": device_uid,
                         "auth_token": auth_token,
                         "date": today,
-                        "time_frame": time_frame
+                        "time_frame": time_frame,
+                        "lab_id": lab_id
                     }
                     save_enc_data(token_obj, controller.dirPath)
 

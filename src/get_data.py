@@ -4,16 +4,28 @@ import pprint
 import re, uuid
 import os.path, time, datetime
 import platform
+import getpass
 from requests import get
 
 
 def _getCpuInfo():
     try:
         cpu_obj: dict = {}
-        cpu_info = cpuinfo.get_cpu_info().items()
-        for key, value in cpu_info:
-            cpu_obj.update({key : value})
-        del cpu_obj['flags']
+        if platform.system() == 'Linux':
+            cpu_info = cpuinfo.get_cpu_info().items()
+            for key, value in cpu_info:
+                cpu_obj.update({key : value})
+            del cpu_obj['flags']
+        elif platform.system() == 'Windows':
+            import subprocess
+            cmd = 'wmic cpu list full'
+            proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+
+            for line in proc.stdout:
+                if line.rstrip():
+                    pinfo = line.decode().rstrip()
+                    pinfo = pinfo.split('=')
+                    cpu_obj.update({pinfo[0]:pinfo[1]});
         return cpu_obj
     except Exception as error:
         print('error', error)
@@ -47,20 +59,34 @@ def _getDiskInfo():
 def _getProcessInfo():
     try:
         listOfProcObjects = []
-        # Iterate over the list
-        for proc in psutil.process_iter():
-            try:
-                # Fetch process details as dict
-                pinfo = proc.as_dict(attrs=['pid', 'name', 'username'])
-                pinfo['vms'] = proc.memory_info().vms / (1024 * 1024)
-                # Append dict to list
-                listOfProcObjects.append(pinfo);
-            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-                pass
-    
-        # Sort list of dict by key vms i.e. memory usage
-        listOfProcObjects = sorted(listOfProcObjects, key=lambda procObj: procObj['vms'], reverse=True)
-    
+        if platform.system() == 'Linux':
+            # Iterate over the list
+            for proc in psutil.process_iter():
+                try:
+                    # Fetch process details as dict
+                    pinfo = proc.as_dict(attrs=['pid', 'name', 'username'])
+                    pinfo['vms'] = proc.memory_info().vms / (1024 * 1024)
+                    # Append dict to list
+                    listOfProcObjects.append(pinfo);
+                except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                    pass
+        
+            # Sort list of dict by key vms i.e. memory usage
+            listOfProcObjects = sorted(listOfProcObjects, key=lambda procObj: procObj['vms'], reverse=True)
+        
+        elif platform.system() == 'Windows':
+            import subprocess
+            cmd = 'powershell "gps | where {$_.MainWindowTitle } | select Description'
+            proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+            for line in proc.stdout:
+                if line.rstrip():
+                    # only print lines that are not empty
+                    # decode() is necessary to get rid of the binary string (b')
+                    # rstrip() to remove `\r\n`
+                    # print(line.decode().rstrip())
+                    pinfo = line.decode().rstrip()
+                    listOfProcObjects.append(pinfo);
+
         return listOfProcObjects
     except Exception as error:
         print('error', error)
@@ -127,16 +153,27 @@ def gateway_ip():
     except Exception as error:
         print('error', error)
 
+def user_name():
+    username = getpass.getuser()
+    return username
+
+def get_platform():
+    platform_name = platform.system()
+    return platform_name
+
 def getData(data):
     try:
         # print('msg', msg.split(','))
         all_info = {}
+        
 
         status_value = data.get("status", "")
         if 'status' in data and status_value == 1:
             # status info
             status_info = getStatus()
             all_info.update({'status': status_info})
+
+        
 
 
         # idle_value = data.get("idle", "")
@@ -151,6 +188,8 @@ def getData(data):
             # cpu info
             cpu_info = _getCpuInfo()
             all_info.update({'cpu_info': cpu_info})
+
+        # return all_info
 
 
         memory_value = data.get("memory", "")
@@ -186,6 +225,12 @@ def getData(data):
 
         gateway_ip_value = gateway_ip()
         all_info.update({'gateway_ip': gateway_ip_value})
+
+        get_platform_value = get_platform()
+        all_info.update({'platform': get_platform_value})
+
+        user_name_value = user_name()
+        all_info.update({'user_name': user_name_value})
 
         return all_info
         # pp = pprint.PrettyPrinter(indent=4)

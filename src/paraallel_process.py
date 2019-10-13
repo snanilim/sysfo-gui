@@ -1,6 +1,6 @@
-from multiprocessing import Pool
+from multiprocessing import Pool, freeze_support
 from time import sleep
-import os, ast, json
+import os, ast, json, platform
 import datetime
 from helper import *
 
@@ -69,6 +69,8 @@ def FinalProcess(parsed,pattern,calc_results):
     return True
 
 def main():
+    if platform.system() == "Windows":
+        freeze_support()
     pool = Pool(processes=3)
     runMqtt = pool.apply_async(loginProcess, ['largefile'])
     runCountEntry = pool.apply_async(countProcess, [ovalue])
@@ -80,4 +82,6 @@ def main():
 
 # your __main__ handler goes here
 if __name__ == '__main__':
+    if platform.system() == "Windows":
+        freeze_support()
     main()

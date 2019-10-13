@@ -90,9 +90,15 @@ class MQTTClient(object):
                 token_obj = token_obj.replace("'", "\"")
                 token_obj = eval(token_obj)
                 device_uuid = token_obj['device_uuid']
+                lab_id = token_obj['lab_id']
                 print('token_obj', device_uuid)
                 self.client.subscribe(f"srdl/req_info/{device_uuid}/", 1)
                 self.client.subscribe(f"srdl/req_idle_status/{device_uuid}/", 1)
+
+                self.client.subscribe(f"srdl/req_info/{lab_id}/", 1)
+                self.client.subscribe(f"srdl/req_idle_status/{lab_id}/", 1)
+
+                self.init_start_info(device_uuid)
         except Exception as error:
             print('error', error)
 
@@ -138,6 +144,7 @@ class MQTTClient(object):
                     data = eval(data)
                     
                     all_info.append(data)
+                    fileRead.close()
                     os.remove(f"{mypath}/{fileName}")
                 break
             
@@ -160,6 +167,33 @@ class MQTTClient(object):
             topic = all_info
             topic_dump = json.dumps(topic)
             self.client.publish(f"srdl/res_idle_status/{device_uuid}/", topic_dump)
+        except Exception as error:
+            print('error', error)
+
+    def init_start_info(self, device_uuid):
+        try:
+            all_info = {}
+
+            status_info = getStatus()
+            all_info.update({'status': status_info})
+
+            mac_addr_value = mac_addr()
+            all_info.update({'mac_addr': mac_addr_value})
+
+            gateway_ip_value = gateway_ip()
+            all_info.update({'gateway_ip': gateway_ip_value})
+
+            get_platform_value = get_platform()
+            all_info.update({'platform': get_platform_value})
+
+            user_name_value = user_name()
+            all_info.update({'user_name': user_name_value})
+
+            all_info.update({'device_uuid': device_uuid})
+
+            topic = all_info
+            topic_dump = json.dumps(topic)
+            self.client.publish(f"srdl/start_status/{device_uuid}/", topic_dump)
         except Exception as error:
             print('error', error)
         
