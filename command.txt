@@ -27,7 +27,7 @@ response:
 {
    "auth": 1,
    "result": "True",
-   "device_uid": "76f08fa6-93e0-4314-96ff-f772fd3ed5d1"
+   "device_uuid": "76f08fa6-93e0-4314-96ff-f772fd3ed5d1"
 }
 
 srdl/res_lab/76f08fa6-93e0-4314-96ff-f772fd3ed5d1/

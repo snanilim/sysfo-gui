@@ -41,12 +41,18 @@ class Container(tk.Tk):
             # tk.title("Python GUI")
             # win = tk.Tk()               # Create instance 
             self.winfo_toplevel().title("Sheikh Rasel Digital Lab")
-            self.device_uid = str
+            self.device_uuid = str
             self.dirPath = str
-            # self.device_uid = '76f08fa6-93e0-4314-96ff-f772fd3ed5d1'
-
+            # self.device_uuid = '76f08fa6-93e0-4314-96ff-f772fd3ed5d1'
             WIDTH = 650
             HEIGHT = 450
+            if platform.system() == 'Linux':
+                WIDTH = 600
+                HEIGHT = 400
+            elif platform.system() == 'Windows':
+                WIDTH = 650
+                HEIGHT = 450
+        
             FrameColor = '#a19eae'
             ButtonColor = '#555c9c'
 
@@ -119,14 +125,14 @@ class LoginPage(tk.Frame):
                 client = MQTTClient(controller.dirPath)
                 client.dirPath = controller.dirPath
                 mac_info = mac_addr()
-                info = {"mac_addr" : mac_info, "userid" : userid, "password": password}
+                info = {"mac_addr" : mac_info, "user_id" : userid, "password": password}
                 client.on_subscribe(f'srdl/res_login/{mac_info}/')
                 client.on_publish('srdl/req_login/', info)
                 client.on_loop_forever()
                 print('client.msg', client.msg)
                 result = eval(client.msg['result'])
-                device_uid = client.msg['device_uid']
-                controller.device_uid = device_uid
+                device_uuid = client.msg['device_uuid']
+                controller.device_uuid = device_uuid
                 # mqtt end
 
                 if result:
@@ -164,10 +170,10 @@ class LabIDPage(tk.Frame):
                 client = MQTTClient(controller.dirPath)
                 client.dirPath = controller.dirPath
                 mac_info = mac_addr()
-                device_uid = controller.device_uid
-                info = {"mac_addr": mac_info, "device_uid": device_uid, "labid" : labid}
-                client.on_subscribe(f'srdl/res_lab/{device_uid}/')
-                client.on_publish(f'srdl/req_lab/{device_uid}/', info)
+                device_uuid = controller.device_uuid
+                info = {"mac_addr": mac_info, "device_uuid": device_uuid, "lab_id" : labid}
+                client.on_subscribe(f'srdl/res_lab/{device_uuid}/')
+                client.on_publish(f'srdl/req_lab/{device_uuid}/', info)
                 client.on_loop_forever()
                 result = eval(client.msg['result'])
                 print('result', result)
@@ -206,7 +212,8 @@ class InfoPage(tk.Frame):
             get_data = GetData()
             data = get_data.registrationInfo()
 
-            res_info = json.dumps(data)
+            # res_info = json.dumps(data)
+            res_info = data
 
             cpu_info = data['cpu_info']
             memory_info = data['memory_info']
@@ -278,10 +285,10 @@ class InfoPage(tk.Frame):
                 client = MQTTClient(controller.dirPath)
                 client.dirPath = controller.dirPath
                 # info = {"info" : info}
-                device_uid = controller.device_uid
+                device_uuid = controller.device_uuid
                 
-                client.on_subscribe(f'srdl/res_reg/{device_uid}/')
-                client.on_publish(f'srdl/req_reg/{device_uid}/', info)
+                client.on_subscribe(f'srdl/res_reg/{device_uuid}/')
+                client.on_publish(f'srdl/req_reg/{device_uuid}/', info)
                 client.on_loop_forever()
                 result = eval(client.msg['result'])
                 lab_id = client.msg['lab_id']
@@ -290,10 +297,10 @@ class InfoPage(tk.Frame):
 
                 if result:
                     print('result', result)
-                    auth_token = f'this is auth token of device id {device_uid}'
+                    auth_token = f'this is auth token of device id {device_uuid}'
                     today = datetime.datetime.now()
                     token_obj = {
-                        "device_uuid": device_uid,
+                        "device_uuid": device_uuid,
                         "auth_token": auth_token,
                         "date": today,
                         "time_frame": time_frame,

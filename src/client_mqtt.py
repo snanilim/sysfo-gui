@@ -16,7 +16,7 @@ class MQTTClient(object):
             
             self.result = bool
             self.msg = dict
-            self.device_uid = str
+            self.device_uuid = str
 
             self.BROKER_IP = "broker.hivemq.com"
             self.PORT = 1883
@@ -71,6 +71,8 @@ class MQTTClient(object):
                     self.get_and_send_data(msg_data, device_uuid)
                 elif 'idle' in msg_data:
                     self.send_idle_status(device_uuid)
+                elif 'update' in msg_data:
+                    self.version_update(msg_data)
             elif 'auth' in msg_data and auth_value == 1:
                 print('msg data', msg_data)
                 self.msg = msg_data
@@ -97,6 +99,11 @@ class MQTTClient(object):
 
                 self.client.subscribe(f"srdl/req_info/{lab_id}/", 1)
                 self.client.subscribe(f"srdl/req_idle_status/{lab_id}/", 1)
+
+                # self.client.subscribe("srdl/req_info/", 1)
+                self.client.subscribe("srdl/req_idle_status/", 1)
+
+                self.client.subscribe("srdl/req_version_update/", 1)
 
                 self.init_start_info(device_uuid)
         except Exception as error:
@@ -196,6 +203,9 @@ class MQTTClient(object):
             self.client.publish(f"srdl/start_status/{device_uuid}/", topic_dump)
         except Exception as error:
             print('error', error)
+
+    def version_update(self, msg_data):
+        print('msg data', msg_data)
         
 
 

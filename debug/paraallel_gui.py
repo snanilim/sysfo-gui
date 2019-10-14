@@ -1,4 +1,4 @@
-from multiprocessing import Process, freeze_support
+from multiprocessing import Pool, freeze_support
 from time import sleep
 import os, ast, json
 
@@ -22,9 +22,12 @@ def loginProcess(largefile):
 
 def main():
     freeze_support()
-    p = Process(target=loginProcess, args=('bob',))
-    p.start()
-    p.join()
+    pool = Pool(processes=3)
+    a = pool.apply_async(loginProcess, ['bob'])
+    b = pool.apply_async(loginProcess, ['bob'])
+
+    pool.close()
+    pool.join()
 
 
 # your __main__ handler goes here

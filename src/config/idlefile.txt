@@ -1,1 +1,1 @@
-{'click': 30, 'press': 25}
+{'click': 3, 'press': 1}

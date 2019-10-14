@@ -1,6 +1,6 @@
 from multiprocessing import Pool, freeze_support
 from time import sleep
-import os, ast, json, platform
+import os, ast, json, platform, sys
 import datetime
 from helper import *
 
@@ -11,7 +11,11 @@ ovalue = 0
 
 def loginProcess(largefile):
     try:
-        dirPath = os.path.dirname(os.path.abspath(__file__))
+        if getattr(sys, 'frozen', False):
+            dirPath = os.path.dirname(sys.executable)
+        elif __file__:
+            dirPath = os.path.dirname(__file__)
+        
         data = has_data_on_file(dirPath)
         if data:
             token_obj = get_dec_data(data)
@@ -42,7 +46,11 @@ def loginProcess(largefile):
 
 def countProcess(bigfile):
     try:
-        dirPath = os.path.dirname(os.path.abspath(__file__))
+        if getattr(sys, 'frozen', False):
+            dirPath = os.path.dirname(sys.executable)
+        elif __file__:
+            dirPath = os.path.dirname(__file__)
+        
         from count_entry import CountEntry
         count = CountEntry()
         count.dirPath = dirPath
@@ -54,7 +62,11 @@ def countProcess(bigfile):
 
 def runSchedule(integer):
     try:
-        dirPath = os.path.dirname(os.path.abspath(__file__))
+        if getattr(sys, 'frozen', False):
+            dirPath = os.path.dirname(sys.executable)
+        elif __file__:
+            dirPath = os.path.dirname(__file__)
+
         from run_scheduler import run_schedule
         run_schedule(dirPath)
         return True
