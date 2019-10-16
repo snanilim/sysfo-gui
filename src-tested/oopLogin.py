@@ -125,12 +125,12 @@ class LoginPage(tk.Frame):
                 client.on_loop_forever()
                 print('client.msg', client.msg)
                 result = eval(client.msg['result'])
-                device_uuid = client.msg['device_uuid']
-                controller.device_uuid = device_uuid
                 # mqtt end
 
                 if result:
                     print('result', result)
+                    device_uuid = client.msg['device_uuid']
+                    controller.device_uuid = device_uuid
                     controller.show_frame(LabIDPage)
                 else:
                     controller.show_frame(ErrorPage)
@@ -285,12 +285,12 @@ class InfoPage(tk.Frame):
                 client.on_publish(f'srdl/req_reg/{device_uuid}/', info)
                 client.on_loop_forever()
                 result = eval(client.msg['result'])
-                lab_id = client.msg['lab_id']
-                time_frame = client.msg['time_frame']
                 # mqtt end
 
                 if result:
                     print('result', result)
+                    lab_id = client.msg['lab_id']
+                    time_frame = client.msg['time_frame']
                     auth_token = f'this is auth token of device id {device_uuid}'
                     today = datetime.datetime.now()
                     token_obj = {
