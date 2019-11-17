@@ -12,7 +12,7 @@ import os
 import platform
 from client_mqtt import MQTTClient
 from get_data import *
-from helper import save_enc_data
+from helper import save_enc_data, crt_shortcut_save
 
 class GetData(object):
     def registrationInfo(self):
@@ -68,7 +68,7 @@ class Container(tk.Tk):
 
             self.frames = {}
 
-            for F in (LoginPage, LabIDPage, InfoPage, ErrorPage):
+            for F in (LoginPage, LabIDPage, InfoPage, ErrorPage, SuccessPage):
                 print(F)
                 frame = F(container, self, FrameColor, ButtonColor)
                 self.frames[F] = frame
@@ -96,6 +96,8 @@ class LoginPage(tk.Frame):
         try:
             tk.Frame.__init__(self, parent, bg=FrameColor)
 
+            self.shouldDelete = True
+
             label = tk.Label(self, bg=FrameColor, font=('Courier', 22), text="Login", justify='left')
             label.place(relwidth=1, relheight=0.2)
 
@@ -103,6 +105,9 @@ class LoginPage(tk.Frame):
             userIDLabel.place(relx=0.03, rely=0.25, relwidth=0.3, relheight=0.12, anchor='nw')
 
             userIDEntry = tk.Entry(self, font=('Courier', 15))
+            placeholder_text = 'yourmail@gmail.com'
+            userIDEntry.insert(0, placeholder_text)
+            userIDEntry.bind("<Button-1>", lambda event: clear_entry(event, userIDEntry))
             userIDEntry.place(relx=0.30, rely=0.25, relwidth=0.6, relheight=0.12)
 
 
@@ -116,6 +121,11 @@ class LoginPage(tk.Frame):
             button.place(relx=0.35, rely=0.70, relheight=0.15, relwidth=0.4)
         except Exception as error:
             print('error', error)
+        
+        def clear_entry(event, entry):
+            if self.shouldDelete:
+                entry.delete(0, 'end')
+                self.shouldDelete = False
 
         def get_info(userid, password, controller):
             try:
@@ -307,15 +317,33 @@ class InfoPage(tk.Frame):
                         "lab_id": lab_id
                     }
                     save_enc_data(token_obj, controller.dirPath)
+                    crt_shortcut_save(controller.dirPath)
 
-                    # controller.show_frame(LabIDPage)
-                    controller.quit()
-                    print('quit')
+                    controller.show_frame(SuccessPage)
+                    
                     
                 else:
                     controller.show_frame(ErrorPage)
             except Exception as error:
                 print('error', error)
+
+
+class SuccessPage(tk.Frame):
+    def __init__(self, parent, controller, FrameColor, ButtonColor):
+        try:
+            tk.Frame.__init__(self, parent, bg=FrameColor)
+            label = tk.Label(self, font=('Courier', 22), text="Login Successfull", fg="green")
+            label.pack(pady=10, padx=10)
+
+            # button1 = tk.Button(self, text="Close", command=lambda: controller.show_frame(LoginPage))
+            button1 = tk.Button(self, text="Close", font=('Courier', 22), bg=ButtonColor, command=lambda: submit())
+            button1.pack()
+        except Exception as error:
+            print('error', error)
+
+        def submit():
+            controller.quit()
+            print('quit')
 
 
 class ErrorPage(tk.Frame):

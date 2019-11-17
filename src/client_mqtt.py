@@ -3,6 +3,7 @@ import uuid, json, os, ast
 import datetime
 from helper import *
 from get_data import *
+import wget
 
 
 class MQTTClient(object):
@@ -71,8 +72,8 @@ class MQTTClient(object):
                     self.get_and_send_data(msg_data, device_uuid)
                 elif 'idle' in msg_data:
                     self.send_idle_status(device_uuid)
-                # elif 'update' in msg_data:
-                #     self.version_update(msg_data)
+                elif 'update' in msg_data:
+                    self.version_update(msg_data)
             elif 'auth' in msg_data and auth_value == 1:
                 print('msg data', msg_data)
                 self.msg = msg_data
@@ -104,6 +105,9 @@ class MQTTClient(object):
                 self.client.subscribe("srdl/req_idle_status/", 1)
 
                 # self.client.subscribe("srdl/req_version_update/", 1)
+
+                self.client.subscribe(f"srdl/req_version_update/{device_uuid}/", 1)
+                self.client.subscribe("srdl/req_version_update/", 1)
 
                 self.init_start_info(device_uuid)
         except Exception as error:
@@ -198,14 +202,30 @@ class MQTTClient(object):
 
             all_info.update({'device_uuid': device_uuid})
 
+            version_name = get_version(self.dirPath)
+            all_info.update({'version': version_name})
+
             topic = all_info
             topic_dump = json.dumps(topic)
             self.client.publish(f"srdl/start_status/{device_uuid}/", topic_dump)
         except Exception as error:
             print('error', error)
 
-    # def version_update(self, msg_data):
-    #     print('msg data', msg_data)
-        
+    def version_update(self, msg_data):
+        print('msg data', msg_data)
+        url_value = msg_data.get("download_url", "")
+        version_value = msg_data.get("version", "")
+        print('url_value', url_value)
+        url = url_value
+        # wget.download(url_value, f"{self.dirPath}\srdl_new_agent.exe")
+        print('download complete')
+        version_obj = {
+            "version": version_value,
+        }
+        f = open(f"{self.dirPath}/config/version.txt", "w")
+        f.write(str(version_obj))
+        f.close()
+
+        os.startfile(f'{self.dirPath}\kill_process.exe')
 
 

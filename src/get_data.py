@@ -2,10 +2,11 @@ import psutil
 import cpuinfo
 import pprint
 import re, uuid
-import os.path, time, datetime
+import os.path, time, datetime, ast
 import platform
 import getpass
 from requests import get
+import win32com.client
 
 
 def _getCpuInfo():
@@ -160,6 +161,53 @@ def user_name():
 def get_platform():
     platform_name = platform.system()
     return platform_name
+
+def get_version(dirPath):
+    fileRead = open(f"{dirPath}/config/version.txt", "r")
+    data = fileRead.read()
+    data = ast.literal_eval(data)
+    version_name = data['version']
+    return version_name
+
+
+def getPrinterInfo():
+    try:
+        cpu_obj: dict = {}
+        if platform.system() == 'Linux':
+            pass
+        elif platform.system() == 'Windows':
+            import subprocess
+            cmd = 'wmic printer get name'
+            proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+            print('proc', proc)
+
+            avoid_list = ['Name', 'Send To OneNote 2013', 'Microsoft XPS Document Writer', 'Microsoft Print to PDF', 'Fax']
+            printer_list = []
+
+            for line in proc.stdout:
+                if line.rstrip():
+                    pinfo = line.decode().rstrip()
+                    if pinfo not in avoid_list:
+                        print('pinfo', pinfo)
+                        printer_list.append(pinfo)
+        print('printer_list', printer_list)
+        return printer_list
+    except Exception as error:
+        print('error', error)
+
+
+def get_usb_device():
+    try:
+        usb_list = []
+        wmi = win32com.client.GetObject ("winmgmts:")
+        for usb in wmi.InstancesOf ("Win32_USBHub"):
+            print(usb.description)
+            usb_list.append(usb.description)
+
+        print(usb_list)
+        return usb_list
+    except Exception as error:
+        print('error', error)
 
 def getData(data):
     try:

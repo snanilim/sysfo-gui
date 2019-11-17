@@ -5,7 +5,7 @@ import subprocess
 
 def kill_process():
     try:
-        PROCNAME = "paraallel_process.exe"
+        PROCNAME = "agent.exe"
         for proc in psutil.process_iter():
             # check whether the process name matches
             if proc.name() == PROCNAME:
@@ -16,8 +16,8 @@ def kill_process():
 
 def rename_prev_process():
     try:
-        if os.path.exists("E:\programmer\sysfo-gui\src\paraallel_process.exe"):
-            os.rename("E:\programmer\sysfo-gui\src\paraallel_process.exe", "E:\programmer\sysfo-gui\src\paraallel_process_old.exe")
+        if os.path.exists("D:\programmer\sysfo-gui\src/agent.exe"):
+            os.rename("D:\programmer\sysfo-gui\src/agent.exe", "D:\programmer\sysfo-gui\src/agent_old.exe")
         else:
             print('File does not exists')
     except Exception as error:
@@ -26,8 +26,8 @@ def rename_prev_process():
 
 def rename_new_process():
     try:
-        if os.path.exists("E:\programmer\sysfo-gui\src\paraallel_process2.exe"):
-            os.rename("E:\programmer\sysfo-gui\src\paraallel_process2.exe", "E:\programmer\sysfo-gui\src\paraallel_process.exe")
+        if os.path.exists("D:\programmer\sysfo-gui\src\srdl_new_agent.exe"):
+            os.rename("D:\programmer\sysfo-gui\src\srdl_new_agent.exe", "D:\programmer\sysfo-gui\src/agent.exe")
         else:
             print('File does not exists')
     except Exception as error:
@@ -36,7 +36,7 @@ def rename_new_process():
 
 def start_new_process():
     try:
-        os.startfile('E:\programmer\sysfo-gui\src\paraallel_process.exe')
+        os.startfile('D:\programmer\sysfo-gui\src/agent.exe')
     except Exception as error:
         print('error', error)
 
@@ -44,14 +44,15 @@ def start_new_process():
 
 def delete_prev_process():
     try:
-        if os.path.exists("E:\programmer\sysfo-gui\src\paraallel_process_old.exe"):
-            os.remove("E:\programmer\sysfo-gui\src\paraallel_process_old.exe")
+        if os.path.exists("D:\programmer\sysfo-gui\src/agent_old.exe"):
+            os.remove("D:\programmer\sysfo-gui\src/agent_old.exe")
         else:
             print('File does not exists')
     except Exception as error:
         print('error', error)
 
 if __name__ == '__main__':
+    delete_prev_process()
     kill_process()
     rename_prev_process()
     rename_new_process()

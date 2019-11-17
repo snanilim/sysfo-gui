@@ -23,6 +23,7 @@ srdl/start_status/76f08fa6-93e0-4314-96ff-f772fd3ed5d1/
 publish:
 srdl/res_login/d8:5d:e2:2f:de:bf/
 srdl/res_login/24:e8:84:3b:16:/
+srdl/res_login/84:e2:81:74:d4:fd/
 response:
 {
    "auth": 1,
@@ -57,3 +58,20 @@ srdl/req_idle_status/123456/
    "idle": 1,
    "status": 1
 }
+
+
+srdl/req_version_update/76f08fa6-93e0-4314-96ff-f772fd3ed5d1/
+srdl/req_version_update/
+{
+   "update": 1,
+   "version": "2.0.0",
+   "download_url": "http://192.168.3.114/srdl_new_agent.exe"
+}
+
+
+
+# https://medium.com/dreamcatcher-its-blog/making-an-stand-alone-executable-from-a-python-script-using-pyinstaller-d1df9170e263
+
+pyinstaller --onefile <your_script_name>.py
+pyinstaller -w --onefile <your_script_name>.py
+pyinstaller -w --onefile .\agents.pyw
