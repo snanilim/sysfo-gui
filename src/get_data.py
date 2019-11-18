@@ -47,11 +47,16 @@ def _getMemoryInfo():
 
 def _getDiskInfo():
     try:
-        disk_obj: dict = {}
-        disk = psutil.disk_usage('/')
-        for key in disk._fields:
-            value = getattr(disk, key)
-            disk_obj.update({key: value})
+        dps = psutil.disk_partitions(all=True)
+        disk_obj: dict = {'total': 0, 'used': 0, 'free': 0, 'percent': 0}
+        for i in range(len(dps)):
+            dp = dps[i]
+            disk = psutil.disk_usage(dp.mountpoint)
+            for key in disk._fields:
+                value = getattr(disk, key)
+                disk_obj[key] = disk_obj.get(key) + value
+
+        # print(disk_obj)
         return disk_obj
     except Exception as error:
         print('error', error)

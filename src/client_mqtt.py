@@ -74,6 +74,8 @@ class MQTTClient(object):
                     self.send_idle_status(device_uuid)
                 elif 'update' in msg_data:
                     self.version_update(msg_data)
+                elif 'time_frame' in msg_data:
+                    self.update_time_frame(msg_data)
             elif 'auth' in msg_data and auth_value == 1:
                 print('msg data', msg_data)
                 self.msg = msg_data
@@ -108,6 +110,9 @@ class MQTTClient(object):
 
                 self.client.subscribe(f"srdl/req_version_update/{device_uuid}/", 1)
                 self.client.subscribe("srdl/req_version_update/", 1)
+
+                self.client.subscribe(f"srdl/req_timeframe_update/{device_uuid}/", 1)
+                self.client.subscribe("srdl/req_timeframe_update/", 1)
 
                 self.init_start_info(device_uuid)
         except Exception as error:
@@ -227,5 +232,21 @@ class MQTTClient(object):
         f.close()
 
         os.startfile(f'{self.dirPath}\kill_process.exe')
+
+
+    def update_time_frame(self, msg_data):
+        conf_data = has_data_on_file(self.dirPath)
+        if conf_data:
+            token_obj = get_dec_data(conf_data)
+            token_obj = token_obj.replace("'", "\"")
+            token_obj = eval(token_obj)
+
+            updated_time = msg_data.get("updated_time", "")
+            token_obj['time_frame'] = updated_time
+
+            save_enc_data(token_obj, self.dirPath)
+
+            print('token_obj', token_obj)
+
 
 

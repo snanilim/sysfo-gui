@@ -41,9 +41,9 @@ class Container(tk.Tk):
             # tk.title("Python GUI")
             # win = tk.Tk()               # Create instance 
             self.winfo_toplevel().title("Sheikh Rasel Digital Lab")
-            self.device_uuid = str
+            # self.device_uuid = str
             self.dirPath = str
-            # self.device_uuid = '76f08fa6-93e0-4314-96ff-f772fd3ed5d1'
+            self.device_uuid = '76f08fa6-93e0-4314-96ff-f772fd3ed5d1'
             WIDTH = 650
             HEIGHT = 450
             if platform.system() == 'Linux':
@@ -59,7 +59,7 @@ class Container(tk.Tk):
             canvas = tk.Canvas(self, height=HEIGHT, width=WIDTH)
             canvas.pack()
 
-            self.background_image = tk.PhotoImage(file="./img/login-background-8.png")
+            self.background_image = tk.PhotoImage(file=f"{args[0]}/img/login-background-8.png")
             background_label = tk.Label(master=self, image=self.background_image)
             background_label.place(relwidth=1, relheight=1)
 
@@ -75,8 +75,8 @@ class Container(tk.Tk):
 
                 frame.place(relwidth=1, relheight=1)
 
-            self.show_frame(LoginPage)
-            # self.show_frame(InfoPage)
+            # self.show_frame(LoginPage)
+            self.show_frame(InfoPage)
         except Exception as error:
             print('error', error)
 
@@ -361,7 +361,7 @@ class ErrorPage(tk.Frame):
 
 def run_ooplogin(dirPath):
     try:
-        app = Container()
+        app = Container(dirPath)
         app.dirPath = dirPath
         app.mainloop()
         app.destroy()

@@ -68,6 +68,13 @@ srdl/req_version_update/
    "download_url": "http://192.168.3.114/srdl_new_agent.exe"
 }
 
+srdl/req_timeframe_update/76f08fa6-93e0-4314-96ff-f772fd3ed5d1/
+srdl/req_timeframe_update/
+{
+   "time_frame": 1,
+   "updated_time": 1000
+}
+
 
 
 # https://medium.com/dreamcatcher-its-blog/making-an-stand-alone-executable-from-a-python-script-using-pyinstaller-d1df9170e263
