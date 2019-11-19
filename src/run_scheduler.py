@@ -23,6 +23,7 @@ def get_info(sc, dirPath):
                 "memory": 1,
                 "disk": 1,
                 "process": 1,
+                "motherboard": 1,
                 "network": 1
             }
             res_info = getData(data)

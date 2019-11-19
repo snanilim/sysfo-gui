@@ -207,6 +207,9 @@ class MQTTClient(object):
 
             all_info.update({'device_uuid': device_uuid})
 
+            machine_id = get_machine_id()
+            all_info.update({'machine_id': machine_id})
+
             version_name = get_version(self.dirPath)
             all_info.update({'version': version_name})
 

@@ -23,6 +23,8 @@ class GetData(object):
             "cpu": 1,
             "memory": 1,
             "disk": 1,
+            "motherboard": 1,
+            "devices": 1,
             "process": 0,
             "network": 0
         }
