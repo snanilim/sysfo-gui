@@ -12,7 +12,9 @@ def write_info():
 def get_info(sc, dirPath):
     try:
         conf_data = has_data_on_file(dirPath)
+        # print('conf_data', conf_data)
         if conf_data:
+            # print('why call')
             # get data
             data = {
                 "info": 1,
@@ -21,11 +23,13 @@ def get_info(sc, dirPath):
                 "memory": 1,
                 "disk": 1,
                 "process": 1,
+                "motherboard": 1,
                 "network": 1
             }
             res_info = getData(data)
             idle_time = getIdleTime(dirPath)
             res_info.update({'idle': idle_time})
+
             # print('idle_time', idle_time)
 
 
@@ -80,5 +84,6 @@ def run_schedule(dirPath):
     s.run()
 
 if __name__ == "__main__":
-    s.enter(1, 1, get_info, (s, "/home/nilim/Documents/programmer/sysfo-gui/src"))
+    dirPath = os.path.dirname(os.path.abspath(__file__))
+    s.enter(1, 1, get_info, (s, dirPath))
     s.run()
