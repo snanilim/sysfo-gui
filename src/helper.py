@@ -1,5 +1,3 @@
-import win32com.client
-import pythoncom
 import os
 
 
@@ -44,6 +42,8 @@ def save_enc_data(token_obj, dirPath):
 
 def crt_shortcut_save(dirPath):
     try:
+        import win32com.client
+        import pythoncom
         # from win32com.shell import shell, shellcon
 
         # print(shell.SHGetFolderPath(0, (shellcon.CSIDL_STARTUP, shellcon.CSIDL_COMMON_STARTUP)[common], None, 0))

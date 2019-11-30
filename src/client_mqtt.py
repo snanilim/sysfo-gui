@@ -3,7 +3,7 @@ import uuid, json, os, ast
 import datetime
 from helper import *
 from get_data import *
-import wget
+# import wget
 
 
 class MQTTClient(object):

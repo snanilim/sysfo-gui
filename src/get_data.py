@@ -6,7 +6,7 @@ import os.path, time, datetime, ast
 import platform
 import getpass
 from requests import get
-import win32com.client
+# import win32com.client
 import subprocess, json
 
 
@@ -203,46 +203,66 @@ def getPrinterInfo():
 
 
 def get_machine_id():
-    machine_id = subprocess.check_output('wmic csproduct get uuid').decode().split('\n')[1].strip()
-    print(machine_id)
-    return machine_id
+    try:
+        if platform.system() == 'Linux':
+            # machine_id = os.popen("sudo cat /sys/class/dmi/id/product_uuid")
+            cmd = 'sudo cat /sys/class/dmi/id/product_uuid'
+            proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+            for line in proc.stdout:
+                machine_id = line.decode().rstrip()
+                print('line', machine_id)
+            print('machine_id', machine_id)
+            return machine_id
+        elif platform.system() == 'Windows':
+            machine_id = subprocess.check_output('wmic csproduct get uuid').decode().split('\n')[1].strip()
+            print(machine_id)
+            return machine_id
+    except Exception as error:
+        print('error', error)
 
 
 def get_mother_board_info():
-    cmd = 'powershell "gwmi win32_baseboard | FL Product,Manufacturer,SerialNumber,Version'
-    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    if platform.system() == 'Linux':
+        # sudo dmidecode -t 2
+        return 'mother_board_info'
+    elif platform.system() == 'Windows':
+        cmd = 'powershell "gwmi win32_baseboard | FL Product,Manufacturer,SerialNumber,Version'
+        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
 
-    mother_board_info = {}
+        mother_board_info = {}
 
-    for line in proc.stdout:
-        if line.rstrip():
-            pinfo = line.decode().rstrip()
-            line_split = pinfo.split(' : ')
-            mother_board_info.update({line_split[0].rstrip(): line_split[1]})
-    print(mother_board_info)
-    return mother_board_info
+        for line in proc.stdout:
+            if line.rstrip():
+                pinfo = line.decode().rstrip()
+                line_split = pinfo.split(' : ')
+                mother_board_info.update({line_split[0].rstrip(): line_split[1]})
+        print(mother_board_info)
+        return mother_board_info
 
 
 def get_device_info():
-    try:
-        out = subprocess.getoutput("PowerShell -Command \"& {Get-PnpDevice | Select-Object Status,Class,FriendlyName,InstanceId,PresentOnly | ConvertTo-Json}\"")
-        j = json.loads(out)
-        accepted_item = ['USB', 'PrintQueue', 'Keyboard', 'Mouse', 'Camera', 'AudioEndpoint', 'Camera', 'DiskDrive', 'Display', 'Monitor', 'Bluetooth', 'Biometric']
-        dic = {}
-        for dev in j:
-            if dev['Status'] == 'OK':
-                # usb_list.append(dev['FriendlyName'])
-                # print(dev['Class'], dev['FriendlyName'])
-                if dev['Class'] in accepted_item:
-                    if dev['Class'] in dic.keys():
+    if platform.system() == 'Linux':
+        return 'get_device_info'
+    elif platform.system() == 'Windows':
+        try:
+            out = subprocess.getoutput("PowerShell -Command \"& {Get-PnpDevice | Select-Object Status,Class,FriendlyName,InstanceId,PresentOnly | ConvertTo-Json}\"")
+            j = json.loads(out)
+            accepted_item = ['USB', 'PrintQueue', 'Keyboard', 'Mouse', 'Camera', 'AudioEndpoint', 'Camera', 'DiskDrive', 'Display', 'Monitor', 'Bluetooth', 'Biometric']
+            dic = {}
+            for dev in j:
+                if dev['Status'] == 'OK':
+                    # usb_list.append(dev['FriendlyName'])
+                    # print(dev['Class'], dev['FriendlyName'])
+                    if dev['Class'] in accepted_item:
+                        if dev['Class'] in dic.keys():
+                            dic[dev['Class']].append(dev['FriendlyName'])
+                        else:
+                            dic[dev['Class']] = []
                         dic[dev['Class']].append(dev['FriendlyName'])
-                    else:
-                        dic[dev['Class']] = []
-                    dic[dev['Class']].append(dev['FriendlyName'])
 
-        return dic
-    except Exception as error:
-        print('error', error)
+            return dic
+        except Exception as error:
+            print('error', error)
 
 
 

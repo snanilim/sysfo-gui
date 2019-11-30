@@ -54,21 +54,21 @@
 
 
 
-import subprocess
-machine_id = subprocess.check_output('wmic csproduct get uuid').decode().split('\n')[1].strip()
-print(machine_id)
+# import subprocess
+# machine_id = subprocess.check_output('wmic csproduct get uuid').decode().split('\n')[1].strip()
+# print(machine_id)
 
-def get_mother_board_info():
-    cmd = 'powershell "gwmi win32_baseboard | FL Product,Manufacturer,SerialNumber,Version'
-    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+# def get_mother_board_info():
+#     cmd = 'powershell "gwmi win32_baseboard | FL Product,Manufacturer,SerialNumber,Version'
+#     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
 
-    mother_board_info = {}
+#     mother_board_info = {}
 
-    for line in proc.stdout:
-        if line.rstrip():
-            pinfo = line.decode().rstrip()
-            line_split = pinfo.split(' : ')
-            mother_board_info.update({line_split[0].rstrip(): line_split[1]})
-    print(mother_board_info)
-    return mother_board_info
+#     for line in proc.stdout:
+#         if line.rstrip():
+#             pinfo = line.decode().rstrip()
+#             line_split = pinfo.split(' : ')
+#             mother_board_info.update({line_split[0].rstrip(): line_split[1]})
+#     print(mother_board_info)
+#     return mother_board_info
 
