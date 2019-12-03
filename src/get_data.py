@@ -48,20 +48,47 @@ def _getMemoryInfo():
 
 def _getDiskInfo():
     try:
-        dps = psutil.disk_partitions(all=True)
-        disk_obj: dict = {'total': 0, 'used': 0, 'free': 0, 'percent': 0}
-        for i in range(len(dps)):
-            dp = dps[i]
-            disk = psutil.disk_usage(dp.mountpoint)
-            for key in disk._fields:
-                value = getattr(disk, key)
-                disk_obj[key] = disk_obj.get(key) + value
+        if platform.system() == 'Linux':
+            dps = psutil.disk_partitions(all=True)
+            print(dps)
+            disk_obj: dict = {'total': 0, 'used': 0, 'free': 0, 'percent': 0}
+            for i in range(len(dps)):
+                dp = dps[i]
+                if dp.fstype !="":
+                    disk = psutil.disk_usage(dp.mountpoint)
+                    for key in disk._fields:
+                        value = getattr(disk, key)
+                        disk_obj[key] = disk_obj.get + value
 
-        # print(disk_obj)
-        return disk_obj
+            # print(disk_obj)
+            return disk_obj
+        elif platform.system() == 'Windows':
+            disk_obj: dict = {'total': 0, 'used': 0, 'free': 0, 'percent': 0}
+            cmd = 'powershell "wmic logicaldisk get size'
+            proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+
+            for line in proc.stdout:
+                total = line.decode().rstrip()
+                if total.isdigit():
+                    disk_obj['total'] = disk_obj['total'] + int(total)
+
+            cmd = 'powershell "wmic logicaldisk get freespace'
+            proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+
+            for line in proc.stdout:
+                free = line.decode().rstrip()
+                if free.isdigit():
+                    disk_obj['free'] = disk_obj['free'] + int(free)
+
+
+            disk_obj['used'] = disk_obj['total'] - disk_obj['free']
+
+            disk_obj['percent'] = (disk_obj['used'] / disk_obj['total']) * 100.0
+
+            # print(disk_obj)
+            return disk_obj
     except Exception as error:
         print('error', error)
-
 
 def _getProcessInfo():
     try:
@@ -176,32 +203,6 @@ def get_version(dirPath):
     return version_name
 
 
-def getPrinterInfo():
-    try:
-        cpu_obj: dict = {}
-        if platform.system() == 'Linux':
-            pass
-        elif platform.system() == 'Windows':
-            import subprocess
-            cmd = 'wmic printer get name'
-            proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-            print('proc', proc)
-
-            avoid_list = ['Name', 'Send To OneNote 2013', 'Microsoft XPS Document Writer', 'Microsoft Print to PDF', 'Fax']
-            printer_list = []
-
-            for line in proc.stdout:
-                if line.rstrip():
-                    pinfo = line.decode().rstrip()
-                    if pinfo not in avoid_list:
-                        print('pinfo', pinfo)
-                        printer_list.append(pinfo)
-        print('printer_list', printer_list)
-        return printer_list
-    except Exception as error:
-        print('error', error)
-
-
 def get_machine_id():
     try:
         if platform.system() == 'Linux':
@@ -214,7 +215,14 @@ def get_machine_id():
             print('machine_id', machine_id)
             return machine_id
         elif platform.system() == 'Windows':
-            machine_id = subprocess.check_output('wmic csproduct get uuid').decode().split('\n')[1].strip()
+            machine_id = subprocess.Popen('wmic csproduct get uuid', shell=True, stdout=subprocess.PIPE)
+
+            for line in machine_id.stdout:
+                if len(line) > 5:
+                    print(line.rstrip())
+                    machine_id = line.decode().rstrip()
+            # machine_id.decode().split('\n')[1].strip()
+
             print(machine_id)
             return machine_id
     except Exception as error:
@@ -236,7 +244,7 @@ def get_mother_board_info():
                 pinfo = line.decode().rstrip()
                 line_split = pinfo.split(' : ')
                 mother_board_info.update({line_split[0].rstrip(): line_split[1]})
-        print(mother_board_info)
+        # print(mother_board_info)
         return mother_board_info
 
 

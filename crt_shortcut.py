@@ -54,7 +54,7 @@
 
 
 
-# import subprocess
+import subprocess
 # machine_id = subprocess.check_output('wmic csproduct get uuid').decode().split('\n')[1].strip()
 # print(machine_id)
 
@@ -72,3 +72,40 @@
 #     print(mother_board_info)
 #     return mother_board_info
 
+
+import subprocess
+# disk_obj: dict = {'total': 0, 'used': 0, 'free': 0, 'percent': 0}
+# cmd = 'powershell "wmic logicaldisk get size'
+# proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+
+# for line in proc.stdout:
+#     total = line.decode().rstrip()
+#     if total.isdigit():
+#         disk_obj['total'] = disk_obj['total'] + int(total)
+
+
+# cmd = 'powershell "wmic logicaldisk get freespace'
+# proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+
+# for line in proc.stdout:
+#     free = line.decode().rstrip()
+#     if free.isdigit():
+#         disk_obj['free'] = disk_obj['free'] + int(free)
+
+
+# disk_obj['used'] = disk_obj['total'] - disk_obj['free']
+
+# disk_obj['percent'] = (disk_obj['used'] / disk_obj['total']) * 100.0
+
+# print(disk_obj)
+
+
+machine_id = subprocess.Popen('wmic csproduct get uuid', shell=True, stdout=subprocess.PIPE)
+
+for line in machine_id.stdout:
+    if len(line) > 5:
+        print(line.rstrip())
+        machine_id = line.decode().rstrip()
+# machine_id.decode().split('\n')[1].strip()
+
+print(machine_id)

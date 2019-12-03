@@ -3,7 +3,7 @@ import uuid, json, os, ast
 import datetime
 from helper import *
 from get_data import *
-# import wget
+import wget
 
 
 class MQTTClient(object):
@@ -103,10 +103,10 @@ class MQTTClient(object):
                 self.client.subscribe(f"srdl/req_info/{lab_id}/", 1)
                 self.client.subscribe(f"srdl/req_idle_status/{lab_id}/", 1)
 
-                # self.client.subscribe("srdl/req_info/", 1)
+                self.client.subscribe("srdl/req_info/", 1)
                 self.client.subscribe("srdl/req_idle_status/", 1)
 
-                # self.client.subscribe("srdl/req_version_update/", 1)
+                self.client.subscribe("srdl/req_version_update/", 1)
 
                 self.client.subscribe(f"srdl/req_version_update/{device_uuid}/", 1)
                 self.client.subscribe("srdl/req_version_update/", 1)
@@ -164,6 +164,9 @@ class MQTTClient(object):
                     os.remove(f"{mypath}/{fileName}")
                 break
             
+            version_name = get_version(self.dirPath)
+            all_info.append({"version": version_name})
+
             topic = all_info
             topic_dump = json.dumps(topic)
             self.client.publish(f"srdl/res_info/{device_uuid}/", topic_dump)
@@ -213,6 +216,8 @@ class MQTTClient(object):
             version_name = get_version(self.dirPath)
             all_info.update({'version': version_name})
 
+            all_info.update({'updated_info': 'this agent updated successfully'})
+
             topic = all_info
             topic_dump = json.dumps(topic)
             self.client.publish(f"srdl/start_status/{device_uuid}/", topic_dump)
@@ -220,13 +225,15 @@ class MQTTClient(object):
             print('error', error)
 
     def version_update(self, msg_data):
+        self.client.publish(f"srdl/update_req/", "update req rcv")
         print('msg data', msg_data)
         url_value = msg_data.get("download_url", "")
         version_value = msg_data.get("version", "")
         print('url_value', url_value)
         url = url_value
-        # wget.download(url_value, f"{self.dirPath}\srdl_new_agent.exe")
+        wget.download(url, f"{self.dirPath}/srdl_new_agent.exe")
         print('download complete')
+        self.client.publish(f"srdl/update_req/", "download complete")
         version_obj = {
             "version": version_value,
         }
@@ -234,7 +241,7 @@ class MQTTClient(object):
         f.write(str(version_obj))
         f.close()
 
-        os.startfile(f'{self.dirPath}\kill_process.exe')
+        os.startfile(f'{self.dirPath}/updater.exe')
 
 
     def update_time_frame(self, msg_data):

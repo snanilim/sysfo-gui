@@ -1,6 +1,12 @@
 import psutil
-import os
+import os, sys
 import subprocess
+
+
+if getattr(sys, 'frozen', False):
+    dirPath = os.path.dirname(sys.executable)
+elif __file__:
+    dirPath = os.path.dirname(__file__)
 
 
 def kill_process():
@@ -15,9 +21,10 @@ def kill_process():
 
 
 def rename_prev_process():
+    print('dirpath', dirPath)
     try:
-        if os.path.exists("D:\programmer\sysfo-gui\src/agent.exe"):
-            os.rename("D:\programmer\sysfo-gui\src/agent.exe", "D:\programmer\sysfo-gui\src/agent_old.exe")
+        if os.path.exists(f"{dirPath}/agent.exe") and os.path.exists(f"{dirPath}/srdl_new_agent.exe"):
+            os.rename(f"{dirPath}/agent.exe", f"{dirPath}/agent_old.exe")
         else:
             print('File does not exists')
     except Exception as error:
@@ -26,8 +33,8 @@ def rename_prev_process():
 
 def rename_new_process():
     try:
-        if os.path.exists("D:\programmer\sysfo-gui\src\srdl_new_agent.exe"):
-            os.rename("D:\programmer\sysfo-gui\src\srdl_new_agent.exe", "D:\programmer\sysfo-gui\src/agent.exe")
+        if os.path.exists(f"{dirPath}/srdl_new_agent.exe"):
+            os.rename(f"{dirPath}/srdl_new_agent.exe", f"{dirPath}/agent.exe")
         else:
             print('File does not exists')
     except Exception as error:
@@ -36,7 +43,7 @@ def rename_new_process():
 
 def start_new_process():
     try:
-        os.startfile('D:\programmer\sysfo-gui\src/agent.exe')
+        os.startfile(f'{dirPath}/agent.exe')
     except Exception as error:
         print('error', error)
 
@@ -44,8 +51,8 @@ def start_new_process():
 
 def delete_prev_process():
     try:
-        if os.path.exists("D:\programmer\sysfo-gui\src/agent_old.exe"):
-            os.remove("D:\programmer\sysfo-gui\src/agent_old.exe")
+        if os.path.exists(f"{dirPath}/agent_old.exe"):
+            os.remove(f"{dirPath}/agent_old.exe")
         else:
             print('File does not exists')
     except Exception as error:
